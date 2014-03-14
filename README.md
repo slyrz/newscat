@@ -1,0 +1,1 @@
+![newscat](https://raw.github.com/slyrz/newscat/master/img/newscat_logo.png)

@@ -1,0 +1,7 @@
+*.bkp
+*.log
+*.swp
+*.sh
+*~
+newscat
+main

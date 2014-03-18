@@ -21,7 +21,7 @@ extraction.
 For each news article, we compared the element-level predictions with the real
 labels and calculated precision, recall and the balanced F-score.
 
-![Extraction Quality](https://raw.github.com/slyrz/newscat/master/img/newscat_graph.png)
+![Extraction Quality](https://github.com/slyrz/newscat/raw/master/img/newscat_plot.png)
 
 The above figure shows the resulting F-scores ordered in increasing magnitude.
 Thus, the X axis shows the percentage of articles whos F-scores fall below the

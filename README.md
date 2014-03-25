@@ -8,6 +8,23 @@ excluding clutter like image and video captions, editorial side notes,
 "related content" article teasers, advertisements, user comments and meta
 data.
 
+### Getting Started
+
+To download newscat, run
+
+    go get github.com/slyrz/newscat
+
+This will install newscat and, if not present, newscat's only non-standard
+build dependency - the `html` package from the
+[go.net networking libraries](http://code.google.com/p/go.net).
+
+Afterwards run
+
+    go build github.com/slyrz/newscat
+
+to build newscat. A `newscat` binary file should now be present in your
+`$GOPATH/bin` directory.
+
 ### Training and Evaluation
 
 300 news articles were gathered by crawling top submissions from
@@ -32,4 +49,3 @@ value indicated by the y-axis. In other words: the percentiles.
 
 newscat is released under MIT license.
 You can find a copy of the MIT License in the [LICENSE](./LICENSE) file.
-

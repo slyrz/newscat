@@ -10,9 +10,40 @@ import (
 )
 
 var (
-	// Default path to the model file, it's relative to our binary.
-	Path = path.Join(path.Dir(os.Args[0]), "data/model")
+	// Stores the path to the model file.
+	Path = ""
 )
+
+func init() {
+	getModelPath := func(parts ...string) string {
+		return path.Join(path.Join(parts...), "data", "model")
+	}
+
+	// Don't override user-defined paths.
+	if len(Path) > 0 {
+		return
+	}
+
+	// Try to locate the model file by probing two paths:
+	//
+	// - The default $GOPATH/src/... path if the user installed newscat with
+	//   the go get command.
+	// - The directory of the binary file if the user cloned the git repository
+	//   and built newscat inside the source directory.
+	paths := [2]string{
+		getModelPath(os.Getenv("GOPATH"), "src", "github.com", "slyrz", "newscat"),
+		getModelPath(path.Dir(os.Args[0])),
+	}
+	for _, modelPath := range paths {
+		if _, err := os.Stat(modelPath); err == nil {
+			Path = modelPath
+			break
+		}
+	}
+	if len(Path) == 0 {
+		panic("Model file not found.")
+	}
+}
 
 // Atoms is the fixed size SVM part. Combining these fields in a separate
 // struct allows us to read them altogether. We need to know these fields

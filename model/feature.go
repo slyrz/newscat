@@ -5,7 +5,7 @@ import (
 )
 
 // Feature represents a feature vector.
-type Feature [33]float32
+type Feature [34]float32
 
 // FeatureGenerator fills Features with values.
 type FeatureGenerator struct {
@@ -195,16 +195,19 @@ func (fg *FeatureGenerator) SetAncestors(chunk *html.Chunk) {
 func (fg *FeatureGenerator) SetTextStat(chunk *html.Chunk) {
 	fg.Write(chunk.Text.Words)
 	fg.Write(chunk.Text.Sentences)
+	fg.Write(chunk.LinkText)
 }
 
 func (fg *FeatureGenerator) SetTextStatSiblings(chunk *html.Chunk) {
 	if chunk.Prev != nil {
-		fg.SetTextStat(chunk.Prev)
+		fg.Write(chunk.Prev.Text.Words)
+		fg.Write(chunk.Prev.Text.Sentences)
 	} else {
 		fg.Skip(2)
 	}
 	if chunk.Next != nil {
-		fg.SetTextStat(chunk.Next)
+		fg.Write(chunk.Next.Text.Words)
+		fg.Write(chunk.Next.Text.Sentences)
 	} else {
 		fg.Skip(2)
 	}

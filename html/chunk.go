@@ -18,6 +18,7 @@ type Chunk struct {
 	Level     int        // depth of the element node that cointains this chunk
 	Elems     int        // number of elements traversed until we reached the element node
 	Ancestors int        // bitmask of the ancestors of this chunk
+	LinkText  float32    // link text to normal text ratio.
 }
 
 func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
@@ -51,9 +52,29 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	chunk.Elems = doc.elems
 	chunk.Ancestors = doc.ancestors
 
+	// Calculate the ratio between text inside links and text outside links
+	// for the current element's parent. This is useful to determine the
+	// quality of a link. Links used as cross references inside the article
+	// content have a small link text to text ratio,
+	//
+	//	<p>Long text .... <a>short text</a> ... </p>
+	//
+	// whereas related content / navigation links have a really high link text
+	// to text ratio:
+	//
+	// 	<li><a>See also: ...</a></li>
+	linkText := doc.linkText[chunk.Base.Parent]
+	normText := doc.normText[chunk.Base.Parent]
+
+	if normText == 0 && linkText == 0 {
+		chunk.LinkText = 0.0
+	} else {
+		chunk.LinkText = float32(linkText) / float32(linkText+normText)
+	}
+
 	// Detect the classes of the current node. We use the good old class
 	// attribute and the new HTML5 microdata (itemprop attribute) to determine
-	// the content class.
+	// the content class
 	chunk.Classes = make([]string, 0)
 
 	// Ascend parent nodes until we found a class attribute and some

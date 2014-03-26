@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/go.net/html"
 	"errors"
 	"io"
+	"unicode"
 )
 
 const (
@@ -28,6 +29,11 @@ type Document struct {
 	level     int // depth of the current node
 	elems     int // total number of elements visited
 	ancestors int // bitmask which stores ancestor of the current node
+
+	// Number of non-space characters inside link tags / normal tags
+	// per html.ElementNode.
+	linkText map[*html.Node]int // length of text inside <a></a> tags
+	normText map[*html.Node]int // length of text outside <a></a> tags
 }
 
 func NewDocument(r io.Reader) (*Document, error) {
@@ -63,6 +69,10 @@ func (doc *Document) Parse(r io.Reader) error {
 
 	doc.level = 0
 	doc.elems = 0
+	doc.linkText = make(map[*html.Node]int)
+	doc.normText = make(map[*html.Node]int)
+
+	doc.countText(doc.body, false)
 	doc.parseBody(doc.body)
 
 	// Now link the chunks.
@@ -108,6 +118,39 @@ func (doc *Document) parseHead(n *html.Node) {
 	}
 }
 
+// countText counts the link text and the normal text per html.Node.
+// "Link text" is text inside <a> tags and "normal text" is text inside
+// anything but <a> tags. Of course, counting is done cumulative, so the
+// numbers of a parent node include the numbers of it's child nodes.
+func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, normText int) {
+	linkText = 0
+	normText = 0
+	if n.Type == html.ElementNode && n.Data == "a" {
+		insideLink = true
+	}
+	for s := n.FirstChild; s != nil; s = s.NextSibling {
+		linkTextChild, normTextChild := doc.countText(s, insideLink)
+		linkText += linkTextChild
+		normText += normTextChild
+	}
+	if n.Type == html.TextNode {
+		count := 0
+		for _, rune := range n.Data {
+			if unicode.IsLetter(rune) {
+				count += 1
+			}
+		}
+		if insideLink {
+			linkText += count
+		} else {
+			normText += count
+		}
+	}
+	doc.linkText[n] = linkText
+	doc.normText[n] = normText
+	return
+}
+
 // Parse the <body>...</body> part of the HTML page.
 func (doc *Document) parseBody(n *html.Node) {
 	doc.elems += 1
@@ -128,7 +171,7 @@ func (doc *Document) parseBodyElement(n *html.Node) {
 	// because headings don't contain many children.
 	// Descending into these children and handling every TextNode separately
 	// would make things unnecessary complicated and the result noisy.
-	case "h1", "h2", "h3", "h4", "h5", "h6":
+	case "h1", "h2", "h3", "h4", "h5", "h6", "a":
 		if chunk, err := NewChunk(doc, n); err == nil {
 			doc.Chunks = append(doc.Chunks, chunk)
 		}

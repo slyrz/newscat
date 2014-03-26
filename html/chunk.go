@@ -74,7 +74,7 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 
 	// Detect the classes of the current node. We use the good old class
 	// attribute and the new HTML5 microdata (itemprop attribute) to determine
-	// the content class
+	// the content class.
 	chunk.Classes = make([]string, 0)
 
 	// Ascend parent nodes until we found a class attribute and some

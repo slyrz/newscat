@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"strings"
+	"unicode"
 )
 
 type Text struct {
@@ -19,6 +20,20 @@ func NewText() *Text {
 	return text
 }
 
+// isWord returns true if the passed text seems to be an actual word and not
+// clutter like email addresses or URLs.
+func isWord(text string) bool {
+	letters := 0
+	for _, rune := range text {
+		if unicode.IsLetter(rune) {
+			letters += 1
+		}
+	}
+	// A "real" word must have more than 2 characters (sorry "it")
+	// and is only allowed to contain at most 2 non-letter characters.
+	return (len(text) > 2) && (letters >= (len(text) - 2))
+}
+
 func (t *Text) WriteString(s string) {
 	// If buffer contains text, write a space first to avoid joining words
 	// accidentally.
@@ -32,8 +47,12 @@ func (t *Text) WriteString(s string) {
 			t.buffer.WriteRune(' ')
 		}
 		t.buffer.WriteString(word)
-		t.words.Add(word)
-		t.Words += 1
+		// Check if the current word is a "real" word.
+		if isWord(word) {
+			t.words.Add(word)
+			t.Words += 1
+		}
+		// Check if the current text part ends a sentence.
 		switch word[len(word)-1] {
 		case '!', '.', '?':
 			t.Sentences += 1

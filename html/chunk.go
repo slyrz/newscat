@@ -53,19 +53,28 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	chunk.Ancestors = doc.ancestors
 
 	// Calculate the ratio between text inside links and text outside links
-	// for the current element's parent. This is useful to determine the
+	// for the current element's container. This is useful to determine the
 	// quality of a link. Links used as cross references inside the article
 	// content have a small link text to text ratio,
 	//
 	//	<p>Long text .... <a>short text</a> ... </p>
 	//
-	// whereas related content / navigation links have a really high link text
+	// whereas related content / navigation links have a high link text
 	// to text ratio:
 	//
 	// 	<li><a>See also: ...</a></li>
-	linkText := doc.linkText[chunk.Base.Parent]
-	normText := doc.normText[chunk.Base.Parent]
+	//
+	base := chunk.Base
+Loop:
+	for ; base != nil && base.Parent != nil; base = base.Parent {
+		switch base.Data {
+		case "body", "div", "li", "p", "title":
+			break Loop
+		}
+	}
 
+	linkText := doc.linkText[base]
+	normText := doc.normText[base]
 	if normText == 0 && linkText == 0 {
 		chunk.LinkText = 0.0
 	} else {

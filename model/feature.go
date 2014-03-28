@@ -5,7 +5,7 @@ import (
 )
 
 // Feature represents a feature vector.
-type Feature [36]float32
+type Feature [39]float32
 
 // FeatureGenerator fills Features with values.
 type FeatureGenerator struct {
@@ -133,30 +133,28 @@ func (fg *FeatureGenerator) SetTitleSimilarity(chunk *html.Chunk, title *html.Ch
 // Entries with a "plus comment" indicate that the next N elements share
 // the same offset intentionally.
 var elementTypes = map[string]int{
-	"p":      0,
-	"a":      1,
-	"span":   2,
-	"div":    3,
-	"em":     4, // +1
-	"strong": 4,
-	"h1":     5, // +5
-	"h2":     5,
-	"h3":     5,
-	"h4":     5,
-	"h5":     5,
-	"h6":     5,
+	"p":   0,
+	"a":   1,
+	"div": 2,
+	"h1":  3, // +5
+	"h2":  3,
+	"h3":  3,
+	"h4":  3,
+	"h5":  3,
+	"h6":  3,
 }
 
 func (fg *FeatureGenerator) SetElementType(chunk *html.Chunk) {
 	// One hot encoding of the element type.
 	fg.WriteAt(true, elementTypes[chunk.Base.Data])
-	fg.Skip(6)
+	fg.Skip(4)
 }
 
 var parentTypes = map[string]int{
 	"p":    0,
 	"span": 1,
 	"div":  2,
+	"li":   3,
 }
 
 func (fg *FeatureGenerator) SetParentType(chunk *html.Chunk) {
@@ -164,7 +162,7 @@ func (fg *FeatureGenerator) SetParentType(chunk *html.Chunk) {
 	if chunk.Base.Parent != nil {
 		fg.WriteAt(true, parentTypes[chunk.Base.Parent.Data])
 	}
-	fg.Skip(3)
+	fg.Skip(4)
 }
 
 func (fg *FeatureGenerator) SetSiblingTypes(chunk *html.Chunk) {
@@ -191,6 +189,8 @@ func (fg *FeatureGenerator) SetSiblingTypes(chunk *html.Chunk) {
 
 func (fg *FeatureGenerator) SetAncestors(chunk *html.Chunk) {
 	fg.Write((chunk.Ancestors & html.AncestorArticle) != 0)
+	fg.Write((chunk.Ancestors & html.AncestorAside) != 0)
+	fg.Write((chunk.Ancestors & html.AncestorBlockquote) != 0)
 	fg.Write((chunk.Ancestors & html.AncestorList) != 0)
 }
 
@@ -202,16 +202,18 @@ func (fg *FeatureGenerator) SetTextStat(chunk *html.Chunk) {
 
 func (fg *FeatureGenerator) SetTextStatSiblings(chunk *html.Chunk) {
 	if chunk.Prev != nil {
+		fg.Write(chunk.Prev.Block == chunk.Block)
 		fg.Write(chunk.Prev.Text.Words)
 		fg.Write(chunk.Prev.Text.Sentences)
 	} else {
-		fg.Skip(2)
+		fg.Skip(3)
 	}
 	if chunk.Next != nil {
+		fg.Write(chunk.Next.Block == chunk.Block)
 		fg.Write(chunk.Next.Text.Words)
 		fg.Write(chunk.Next.Text.Sentences)
 	} else {
-		fg.Skip(2)
+		fg.Skip(3)
 	}
 }
 

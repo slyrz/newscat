@@ -12,8 +12,8 @@ const (
 	// children.
 	AncestorArticle = 1 << iota
 	AncestorAside
-	AncestorList
 	AncestorBlockquote
+	AncestorList
 )
 
 type Document struct {
@@ -263,7 +263,7 @@ func (doc *Document) GetClusterStats() map[*Chunk]*TextStat {
 	// Count TextStats for Chunk ancestors.
 	ancestorStat := make(map[*html.Node]*TextStat)
 	for _, chunk := range doc.Chunks {
-		node, count := chunk.Base.Parent, 0
+		node, count := chunk.Block, 0
 		for node != nil && count < maxAncestors {
 			if stat, ok := ancestorStat[node]; ok {
 				stat.Words += chunk.Text.Words
@@ -279,7 +279,7 @@ func (doc *Document) GetClusterStats() map[*Chunk]*TextStat {
 	// Generate result.
 	result := make(map[*Chunk]*TextStat)
 	for _, chunk := range doc.Chunks {
-		node := chunk.Base.Parent
+		node := chunk.Block
 		if node == nil {
 			continue
 		}

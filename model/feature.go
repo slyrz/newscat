@@ -5,7 +5,7 @@ import (
 )
 
 // Feature represents a feature vector.
-type Feature [34]float32
+type Feature [36]float32
 
 // FeatureGenerator fills Features with values.
 type FeatureGenerator struct {
@@ -169,7 +169,7 @@ func (fg *FeatureGenerator) SetParentType(chunk *html.Chunk) {
 
 func (fg *FeatureGenerator) SetSiblingTypes(chunk *html.Chunk) {
 	count := 0
-	types := map[string]int{"a": 0, "p": 0}
+	types := map[string]int{"a": 0, "p": 0, "img": 0}
 	for _, siblingType := range chunk.GetSiblingTypes() {
 		count += 1
 		if val, ok := types[siblingType]; ok {
@@ -179,11 +179,13 @@ func (fg *FeatureGenerator) SetSiblingTypes(chunk *html.Chunk) {
 	fg.Write(count)
 	fg.Write(types["a"])
 	fg.Write(types["p"])
+	fg.Write(types["img"])
 	if count > 0 {
 		fg.Write(float32(types["a"]) / float32(count))
 		fg.Write(float32(types["p"]) / float32(count))
+		fg.Write(float32(types["img"]) / float32(count))
 	} else {
-		fg.Skip(2)
+		fg.Skip(3)
 	}
 }
 

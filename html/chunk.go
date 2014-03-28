@@ -14,6 +14,7 @@ type Chunk struct {
 	Next      *Chunk     // next chunk
 	Text      *util.Text // text of this chunk
 	Base      *html.Node // element node which contained this chunk
+	Block     *html.Node // parent block node of base node
 	Classes   []string   // list of classes this chunk belongs to
 	Level     int        // depth of the element node that cointains this chunk
 	Elems     int        // number of elements traversed until we reached the element node
@@ -47,13 +48,32 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 		return nil, errors.New("no text")
 	}
 
+	// Find the block level container of the base node.
+	chunk.Block = chunk.Base
+Loop:
+	for ; chunk.Block.Parent != nil; chunk.Block = chunk.Block.Parent {
+		// Keep ascending as long as the block node points to an HTML inline
+		// element, so we stop at the first block-level element.
+		// The list of inline elements was taken from
+		// https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
+		switch chunk.Block.Data {
+		case "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite",
+			"code", "dfn", "em", "i", "img", "input", "kbd", "label", "map",
+			"object", "q", "samp", "script", "select", "small", "span",
+			"strong", "sub", "sup", "textarea", "tt", "var":
+			continue Loop
+		default:
+			break Loop
+		}
+	}
+
 	// Copy the document's level and element counter into chunk.
 	chunk.Level = doc.level
 	chunk.Elems = doc.elems
 	chunk.Ancestors = doc.ancestors
 
 	// Calculate the ratio between text inside links and text outside links
-	// for the current element's container. This is useful to determine the
+	// for the current element's block node. This is useful to determine the
 	// quality of a link. Links used as cross references inside the article
 	// content have a small link text to text ratio,
 	//
@@ -64,17 +84,8 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	//
 	// 	<li><a>See also: ...</a></li>
 	//
-	base := chunk.Base
-Loop:
-	for ; base != nil && base.Parent != nil; base = base.Parent {
-		switch base.Data {
-		case "body", "div", "li", "p", "title":
-			break Loop
-		}
-	}
-
-	linkText := doc.linkText[base]
-	normText := doc.normText[base]
+	linkText := doc.linkText[chunk.Block]
+	normText := doc.normText[chunk.Block]
 	if normText == 0 && linkText == 0 {
 		chunk.LinkText = 0.0
 	} else {

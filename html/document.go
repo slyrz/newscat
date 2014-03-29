@@ -177,10 +177,10 @@ func (doc *Document) parseBodyElement(n *html.Node) {
 		}
 		return
 	// Elements save to ignore.
-	case "address", "button", "fieldset", "figcaption", "figure", "footer",
-		"form", "frame", "header", "iframe", "img", "map", "menu", "nav",
-		"noscript", "object", "option", "style", "script", "select", "svg",
-		"textarea":
+	case "address", "audio", "button", "canvas", "fieldset", "figcaption",
+		"figure", "footer", "form", "frame", "header", "iframe", "img", "map",
+		"menu", "nav", "noscript", "object", "option", "output", "script",
+		"select", "style", "svg", "textarea", "video":
 		return
 	// High-level tables might be used to layout the document, so we better not
 	// ignore them.

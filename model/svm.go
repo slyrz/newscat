@@ -120,9 +120,8 @@ func (svm *SVM) RBF(a, b *Feature) float32 {
 	return float32(math.Exp(float64(-svm.G * s)))
 }
 
-// Predict returns true if a feature vector presumably belongs to the
-// article text.
-func (svm *SVM) Predict(x *Feature) bool {
+// Score returns the feature score, smaller is better.
+func (svm *SVM) Score(x *Feature) float32 {
 	var s float32 = 0.0
 	var i int32 = 0
 	var j int32 = 0
@@ -135,14 +134,17 @@ func (svm *SVM) Predict(x *Feature) bool {
 
 	i = 0
 	j = svm.Nsv[0]
-
 	for k = 0; k < svm.Nsv[0]; k++ {
 		s += svm.Cof[i+k] * kern[i+k]
 	}
-
 	for k = 0; k < svm.Nsv[1]; k++ {
 		s += svm.Cof[j+k] * kern[j+k]
 	}
+	return (s - svm.Rho[0])
+}
 
-	return (s - svm.Rho[0]) <= 0
+// Predict returns true if a feature vector presumably belongs to the
+// article text.
+func (svm *SVM) Predict(x *Feature) bool {
+	return svm.Score(x) <= 0.0
 }

@@ -109,8 +109,8 @@ func Features(doc *html.Document) []Feature {
 	for i := 0; i < len(features); i++ {
 		feature := &features[i]
 		for j := 0; j < len(feature); j++ {
-			// We suspect a feature to be normalized it the maximum encountered
-			// value isn't greater than one.
+			// If the maximum encountered value isn't greater than one, we assume
+			// that the feature is already normalized.
 			if empMax[j] > 1.0 {
 				feature[j] = (feature[j] - empMin[j]) / (empMax[j] - empMin[j])
 			}

@@ -8,10 +8,7 @@ import (
 )
 
 func main() {
-	svm, err := model.Open(model.Path)
-	if err != nil {
-		panic(err)
-	}
+	clf := model.NewClassifier()
 	for _, arg := range os.Args[1:] {
 		file, err := os.Open(arg)
 		if err != nil {
@@ -24,7 +21,7 @@ func main() {
 			panic(err)
 		}
 		for i, feature := range model.Features(doc) {
-			if svm.Predict(&feature) {
+			if clf.Predict(&feature) {
 				fmt.Println(doc.Chunks[i].Text)
 			}
 		}

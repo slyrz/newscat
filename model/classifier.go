@@ -1,14 +1,14 @@
 package model
 
 type Classifier struct {
-	Icpt float32
-	Coef []float32
+	Intercept    float32
+	Coefficients []float32
 }
 
 func NewClassifier() *Classifier {
 	clf := new(Classifier)
-	clf.Icpt = -2.564655
-	clf.Coef = []float32{
+	clf.Intercept = -2.564655
+	clf.Coefficients = []float32{
 		2.6330943470553763,
 		-1.055620498492281,
 		-1.1791692175767425,
@@ -54,15 +54,15 @@ func NewClassifier() *Classifier {
 
 // Score returns the feature score, bigger is better.
 func (clf *Classifier) Score(ftr *Feature) float32 {
-	score := clf.Icpt
+	score := clf.Intercept
 	for i := range ftr {
-		score += (ftr[i] * clf.Coef[i])
+		score += (ftr[i] * clf.Coefficients[i])
 	}
 	return score
 }
 
 // Predict returns true if a feature vector presumably is a part of the
 // article text.
-func (clf *Classifier) Predict(x *Feature) bool {
-	return clf.Score(x) > 0.0
+func (clf *Classifier) Predict(ftr *Feature) bool {
+	return clf.Score(ftr) > 0.0
 }

@@ -7,30 +7,26 @@ import (
 	"os"
 )
 
-func printContent(doc *html.Document, clf *model.Classifier) {
+func printChunks(chunks []*html.Chunk) {
 	var last *html.Chunk = nil
 	var delim string = ""
-
-	for i, feature := range model.Features(doc) {
-		if !clf.Predict(&feature) {
-			continue
-		}
+	for _, chunk := range chunks {
 		switch {
 		case last == nil:
 			delim = ""
-		case last.Block != doc.Chunks[i].Block:
+		case last.Block != chunk.Block:
 			delim = "\n\n"
-		case last.Block == doc.Chunks[i].Block:
+		case last.Block == chunk.Block:
 			delim = " "
 		}
-		fmt.Printf("%s%s", delim, doc.Chunks[i].Text)
-		last = doc.Chunks[i]
+		fmt.Printf("%s%s", delim, chunk.Text)
+		last = chunk
 	}
 	fmt.Println()
 }
 
 func main() {
-	clf := model.NewClassifier()
+	ext := model.NewExtractor()
 	for _, arg := range os.Args[1:] {
 		file, err := os.Open(arg)
 		if err != nil {
@@ -42,6 +38,6 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		printContent(doc, clf)
+		printChunks(ext.Extract(doc))
 	}
 }

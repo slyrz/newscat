@@ -15,11 +15,31 @@ type Chunk struct {
 	Text      *util.Text // text of this chunk
 	Base      *html.Node // element node which contained this chunk
 	Block     *html.Node // parent block node of base node
+	Container *html.Node // parent block node of block node
 	Classes   []string   // list of classes this chunk belongs to
 	Level     int        // depth of the element node that cointains this chunk
 	Elems     int        // number of elements traversed until we reached the element node
 	Ancestors int        // bitmask of the ancestors of this chunk
 	LinkText  float32    // link text to normal text ratio.
+}
+
+func getParentBlock(n *html.Node) *html.Node {
+	for ; n != nil && n.Parent != nil; n = n.Parent {
+		// Keep ascending as long as the block node points to an HTML inline
+		// element, so we stop at the first block-level element.
+		// The list of inline elements was taken from
+		// https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
+		switch n.Data {
+		case "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite",
+			"code", "dfn", "em", "i", "img", "input", "kbd", "label", "map",
+			"object", "q", "samp", "script", "select", "small", "span",
+			"strong", "sub", "sup", "textarea", "tt", "var":
+			continue
+		default:
+			return n
+		}
+	}
+	return n
 }
 
 func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
@@ -49,22 +69,13 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	}
 
 	// Find the block level container of the base node.
-	chunk.Block = chunk.Base
-Loop:
-	for ; chunk.Block.Parent != nil; chunk.Block = chunk.Block.Parent {
-		// Keep ascending as long as the block node points to an HTML inline
-		// element, so we stop at the first block-level element.
-		// The list of inline elements was taken from
-		// https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
-		switch chunk.Block.Data {
-		case "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite",
-			"code", "dfn", "em", "i", "img", "input", "kbd", "label", "map",
-			"object", "q", "samp", "script", "select", "small", "span",
-			"strong", "sub", "sup", "textarea", "tt", "var":
-			continue Loop
-		default:
-			break Loop
-		}
+	chunk.Block = getParentBlock(chunk.Base)
+
+	// Container is the block level parent of block.
+	if container := getParentBlock(chunk.Block.Parent); container != nil {
+		chunk.Container = container
+	} else {
+		chunk.Container = chunk.Block
 	}
 
 	// Copy the document's level and element counter into chunk.

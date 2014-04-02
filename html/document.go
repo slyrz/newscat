@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/go.net/html"
 	"errors"
 	"io"
+	"regexp"
 	"unicode"
 )
 
@@ -14,6 +15,10 @@ const (
 	AncestorAside
 	AncestorBlockquote
 	AncestorList
+)
+
+var (
+	ignorePattern = regexp.MustCompile("(?i)comment|caption")
 )
 
 type Document struct {
@@ -165,6 +170,15 @@ func (doc *Document) parseBody(n *html.Node) {
 }
 
 func (doc *Document) parseBodyElement(n *html.Node) {
+	for _, attr := range n.Attr {
+		switch attr.Key {
+		case "id", "class", "itemprop":
+			if ignorePattern.FindStringIndex(attr.Val) != nil {
+				return
+			}
+		}
+	}
+
 	ancestorMask := 0
 	switch n.Data {
 	// We convert headings to text immediately. This is easier and feasible
@@ -177,10 +191,10 @@ func (doc *Document) parseBodyElement(n *html.Node) {
 		}
 		return
 	// Elements save to ignore.
-	case "address", "audio", "button", "canvas", "fieldset", "figcaption",
-		"figure", "footer", "form", "frame", "header", "iframe", "img", "map",
-		"menu", "nav", "noscript", "object", "option", "output", "script",
-		"select", "style", "svg", "textarea", "video":
+	case "address", "audio", "button", "canvas", "caption", "fieldset",
+		"figcaption", "figure", "footer", "form", "frame", "header", "iframe",
+		"img", "map", "menu", "nav", "noscript", "object", "option", "output",
+		"script", "select", "style", "svg", "textarea", "video":
 		return
 	// High-level tables might be used to layout the document, so we better not
 	// ignore them.

@@ -26,10 +26,10 @@ func printChunks(chunks []*html.Chunk) {
 		}
 		// Use bold font for headings, emphasized and bold text.
 		switch chunk.Base.Data {
-			case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
-				pre, pos = "\x1b[39;1m", "\x1b[0m"
-			default:
-				pre, pos = "", ""
+		case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
+			pre, pos = "\x1b[39;1m", "\x1b[0m"
+		default:
+			pre, pos = "", ""
 		}
 		fmt.Printf("%s%s%s%s", delim, pre, chunk.Text, pos)
 		last = chunk

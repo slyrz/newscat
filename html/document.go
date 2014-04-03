@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	ignorePattern = regexp.MustCompile("(?i)comment|caption")
+	ignorePattern = regexp.MustCompile("(?i)comment|caption|header|foot|blq-dotcom|story-feature")
 )
 
 type Document struct {

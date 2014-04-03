@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	numChunkFeatureComp = 39
-	numScoreFeatureComp = 7
+	numChunkFeatureComp = 37
+	numScoreFeatureComp = 9
 )
 
 // Feature represents a feature vector.
@@ -64,19 +64,6 @@ func (fw *FeatureWriter) Skip(n int) {
 
 type ChunkFeatureWriter struct {
 	FeatureWriter
-	lastSim float32
-	bestSim float32
-}
-
-func (fw *ChunkFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *html.Chunk) {
-	if chunk.IsHeading() {
-		fw.lastSim = chunk.Text.Similarity(title.Text)
-		if fw.lastSim > fw.bestSim {
-			fw.bestSim = fw.lastSim
-		}
-	}
-	fw.Write(fw.lastSim)
-	fw.Write(fw.bestSim)
 }
 
 // Entries with a "plus comment" indicate that the next N elements share
@@ -248,5 +235,18 @@ func (fw *ScoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *Cluster) 
 		fw.Write(cluster.Scores[i+1])
 	} else {
 		fw.Write(-10)
+	}
+}
+
+func (fw *ScoreFeatureWriter) WritePredictions(chunk *html.Chunk, predictions bool) {
+	fw.Write(predictions)
+}
+
+func (fw *ScoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *html.Chunk) {
+	switch chunk.Base.Data {
+	case "h1", "h2", "h3":
+		fw.Write(chunk.Text.Similarity(title.Text))
+	default:
+		fw.Skip(1)
 	}
 }

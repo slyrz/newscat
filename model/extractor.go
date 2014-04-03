@@ -38,7 +38,6 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 		// Let the generator fill the current feature vector with our
 		// observations.
-		chunkFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 		chunkFeatureWriter.WriteElementType(chunk)
 		chunkFeatureWriter.WriteParentType(chunk)
 		chunkFeatureWriter.WriteSiblingTypes(chunk)
@@ -84,16 +83,17 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		clusters.Add(chunk.Container, chunk, score)
 	}
 
+	result := make([]*html.Chunk, 0, 8)
+
 	scoreFeatureWriter := new(ScoreFeatureWriter)
 	for i, chunk := range doc.Chunks {
 		scoreFeatureWriter.Assign(scoreFeatures[i][:])
 		scoreFeatureWriter.WriteChunk(chunk)
 		scoreFeatureWriter.WriteCluster(chunk, clusters[chunk.Container])
-	}
+		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
+		scoreFeatureWriter.WritePredictions(chunk, len(result) > 0)
 
-	result := make([]*html.Chunk, 0, 8)
-	for i, scoreFeature := range scoreFeatures {
-		if ScoreFeaturePredict(scoreFeature) {
+		if ScoreFeaturePredict(scoreFeatures[i]) {
 			result = append(result, doc.Chunks[i])
 		}
 	}

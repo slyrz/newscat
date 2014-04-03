@@ -9,13 +9,11 @@ import (
 
 func printChunks(chunks []*html.Chunk) {
 	var last *html.Chunk = nil
-	var delim string = ""
-	var pre string = ""
-	var pos string = ""
 	for _, chunk := range chunks {
-		// If the last chunk and the current chunk share the same HTML block element,
-		// we seperate them by a space character. If they are in different blocks, we
-		// use two newline characters.
+		delim, pre, pos := "", "", ""
+		// If the last chunk and the current chunk are part of the same HTML block,
+		// we seperate them by a space character. If they are in different blocks,
+		// we use two newline characters.
 		switch {
 		case last == nil:
 			delim = ""

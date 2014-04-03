@@ -10,7 +10,12 @@ import (
 func printChunks(chunks []*html.Chunk) {
 	var last *html.Chunk = nil
 	var delim string = ""
+	var pre string = ""
+	var pos string = ""
 	for _, chunk := range chunks {
+		// If the last chunk and the current chunk share the same HTML block element,
+		// we seperate them by a space character. If they are in different blocks, we
+		// use two newline characters.
 		switch {
 		case last == nil:
 			delim = ""
@@ -19,7 +24,14 @@ func printChunks(chunks []*html.Chunk) {
 		case last.Block == chunk.Block:
 			delim = " "
 		}
-		fmt.Printf("%s%s", delim, chunk.Text)
+		// Use bold font for headings, emphasized and bold text.
+		switch chunk.Base.Data {
+			case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
+				pre, pos = "\x1b[39;1m", "\x1b[0m"
+			default:
+				pre, pos = "", ""
+		}
+		fmt.Printf("%s%s%s%s", delim, pre, chunk.Text, pos)
 		last = chunk
 	}
 	fmt.Println()

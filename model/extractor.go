@@ -79,7 +79,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	clusters := NewClusters()
 	for i := 0; i < len(chunkFeatures); i++ {
 		chunk := doc.Chunks[i]
-		score := ChunkFeatureScore(chunkFeatures[i])
+		score := chunkFeatures[i].Score()
 		clusters.Add(chunk.Container, chunk, score)
 	}
 
@@ -93,7 +93,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 		scoreFeatureWriter.WritePredictions(chunk, len(result) > 0)
 
-		if ScoreFeaturePredict(scoreFeatures[i]) {
+		if scoreFeatures[i].Predict() {
 			result = append(result, doc.Chunks[i])
 		}
 	}

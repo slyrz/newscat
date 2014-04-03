@@ -24,11 +24,11 @@ type Chunk struct {
 }
 
 func getParentBlock(n *html.Node) *html.Node {
+	// Keep ascending as long as the node points to an HTML inline element.
+	// We stop at the first block-level element. The list of inline elements
+	// was taken from:
+	// https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
 	for ; n != nil && n.Parent != nil; n = n.Parent {
-		// Keep ascending as long as the block node points to an HTML inline
-		// element, so we stop at the first block-level element.
-		// The list of inline elements was taken from
-		// https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
 		switch n.Data {
 		case "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite",
 			"code", "dfn", "em", "i", "img", "input", "kbd", "label", "map",
@@ -63,15 +63,15 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 		chunk.addText(n)
 	}
 
-	// We want to do text extraction, not whitespace extraction.
+	// We perform text extraction, not whitespace extraction.
 	if chunk.Text.Len() == 0 {
 		return nil, errors.New("no text")
 	}
 
-	// Find the block level container of the base node.
+	// Find the block level container of base.
 	chunk.Block = getParentBlock(chunk.Base)
 
-	// Container is the block level parent of block.
+	// Find the block level container of block.
 	if container := getParentBlock(chunk.Block.Parent); container != nil {
 		chunk.Container = container
 	} else {
@@ -176,14 +176,4 @@ func (ch *Chunk) GetChildTypes() []string {
 		}
 	}
 	return result
-}
-
-// Returns true if the base node of this chunk is a HTML heading element.
-func (ch *Chunk) IsHeading() bool {
-	switch ch.Base.Data {
-	case "h1", "h2", "h3", "h4", "h5", "h6":
-		return true
-	default:
-		return false
-	}
 }

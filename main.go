@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/model"
+	"io"
+	"net/http"
 	"os"
+	"strings"
 )
 
 func printChunks(chunks []*html.Chunk) {
@@ -36,18 +39,37 @@ func printChunks(chunks []*html.Chunk) {
 }
 
 func main() {
-	ext := model.NewExtractor()
-	for _, arg := range os.Args[1:] {
-		file, err := os.Open(arg)
-		if err != nil {
-			panic(err)
+	inputData := make(chan io.Reader, 4)
+	// Open all input (either paths / URLs passed as command line arguments or
+	// read from stdin) and write it to inputData channel.
+	go func() {
+		if args := os.Args[1:]; len(args) > 0 {
+			for _, arg := range args {
+				if strings.HasPrefix(arg, "http://") {
+					if resp, err := http.Get(arg); err == nil {
+						inputData <- resp.Body
+					}
+				} else {
+					if file, err := os.Open(arg); err == nil {
+						inputData <- file
+					}
+				}
+			}
+		} else {
+			inputData <- os.Stdin
 		}
-		defer file.Close()
+		close(inputData)
+	}()
 
-		doc, err := html.NewDocument(file)
-		if err != nil {
-			panic(err)
+	ext := model.NewExtractor()
+	// Read input from inputData channel and perform content extraction.
+	for data := range inputData {
+		// TODO: Warn if parsing Document failed.
+		if doc, err := html.NewDocument(data); err == nil {
+			// TODO: Print warning if no chunks were extracted.
+			if chunks := ext.Extract(doc); len(chunks) > 0 {
+				printChunks(chunks)
+			}
 		}
-		printChunks(ext.Extract(doc))
 	}
 }

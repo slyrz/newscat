@@ -154,25 +154,31 @@ func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, nor
 
 // cleanBody removes unwanted HTML elements from the HTML body.
 func (doc *Document) cleanBody(n *html.Node, level int) {
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if c.Type != html.ElementNode {
+	var curr *html.Node = n.FirstChild
+	var next *html.Node = nil
+	for ; curr != nil; curr = next {
+		// We have to remember the next sibling here becase calling RemoveChild
+		// sets curr's NextSibling pointer to nil and we would quit the loop
+		// prematurely.
+		next = curr.NextSibling
+		if curr.Type != html.ElementNode {
 			continue
 		}
-		switch c.Data {
+		switch curr.Data {
 		// Elements save to ignore.
 		case "address", "audio", "button", "canvas", "caption", "fieldset",
 			"figcaption", "figure", "footer", "form", "frame", "header", "iframe",
 			"map", "menu", "nav", "noscript", "object", "option", "output",
 			"script", "select", "style", "svg", "textarea", "video":
-			n.RemoveChild(c)
+			n.RemoveChild(curr)
 		// High-level tables might be used to layout the document, so we better
 		// not ignore them.
 		case "table":
 			if level > 5 {
-				n.RemoveChild(c)
+				n.RemoveChild(curr)
 			}
 		default:
-			doc.cleanBody(c, level+1)
+			doc.cleanBody(curr, level+1)
 		}
 	}
 }
@@ -204,7 +210,7 @@ func (doc *Document) parseBody(n *html.Node) {
 			return
 		// Now mask the element type, but only if it isn't already set.
 		// If we mask a bit which was already set by one of our callers, we'd also
-		// clear it at the of this function, though it actually should be cleared
+		// clear it at the end of this function, though it actually should be cleared
 		// by the caller.
 		case "article":
 			ancestorMask = AncestorArticle &^ doc.ancestors

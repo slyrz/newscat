@@ -17,8 +17,6 @@ type Chunk struct {
 	Block     *html.Node // parent block node of base node
 	Container *html.Node // parent block node of block node
 	Classes   []string   // list of classes this chunk belongs to
-	Level     int        // depth of the element node that cointains this chunk
-	Elems     int        // number of elements traversed until we reached the element node
 	Ancestors int        // bitmask of the ancestors of this chunk
 	LinkText  float32    // link text to normal text ratio.
 }
@@ -78,9 +76,7 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 		chunk.Container = chunk.Block
 	}
 
-	// Copy the document's level and element counter into chunk.
-	chunk.Level = doc.level
-	chunk.Elems = doc.elems
+	// Remember the ancestors in our chunk.
 	chunk.Ancestors = doc.ancestors
 
 	// Calculate the ratio between text inside links and text outside links

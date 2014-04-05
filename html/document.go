@@ -154,6 +154,24 @@ func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, nor
 
 // cleanBody removes unwanted HTML elements from the HTML body.
 func (doc *Document) cleanBody(n *html.Node, level int) {
+
+	// removeNode returns true if a node should be removed from HTML document.
+	removeNode := func(c *html.Node, level int) bool {
+		switch c.Data {
+		// Elements save to ignore.
+		case "address", "audio", "button", "canvas", "caption", "fieldset",
+			"figcaption", "figure", "footer", "form", "frame", "header",
+			"iframe", "map", "menu", "nav", "noscript", "object", "option",
+			"output", "script", "select", "style", "svg", "textarea", "video":
+			return true
+		// High-level tables might be used to layout the document, so we better
+		// not ignore them.
+		case "table":
+			return level > 5
+		}
+		return false
+	}
+
 	var curr *html.Node = n.FirstChild
 	var next *html.Node = nil
 	for ; curr != nil; curr = next {
@@ -161,24 +179,12 @@ func (doc *Document) cleanBody(n *html.Node, level int) {
 		// sets curr's NextSibling pointer to nil and we would quit the loop
 		// prematurely.
 		next = curr.NextSibling
-		if curr.Type != html.ElementNode {
-			continue
-		}
-		switch curr.Data {
-		// Elements save to ignore.
-		case "address", "audio", "button", "canvas", "caption", "fieldset",
-			"figcaption", "figure", "footer", "form", "frame", "header", "iframe",
-			"map", "menu", "nav", "noscript", "object", "option", "output",
-			"script", "select", "style", "svg", "textarea", "video":
-			n.RemoveChild(curr)
-		// High-level tables might be used to layout the document, so we better
-		// not ignore them.
-		case "table":
-			if level > 5 {
+		if curr.Type == html.ElementNode {
+			if removeNode(curr, level) {
 				n.RemoveChild(curr)
+			} else {
+				doc.cleanBody(curr, level+1)
 			}
-		default:
-			doc.cleanBody(curr, level+1)
 		}
 	}
 }

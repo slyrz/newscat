@@ -31,8 +31,6 @@ type Document struct {
 	body *html.Node // the <body>...</body> part
 
 	// State variables used when collectiong chunks.
-	level     int // depth of the current node
-	elems     int // total number of elements visited
 	ancestors int // bitmask which stores ancestor of the current node
 
 	// Number of non-space characters inside link tags / normal tags
@@ -71,12 +69,10 @@ func (doc *Document) Parse(r io.Reader) error {
 	if doc.Title == nil {
 		return errors.New("Document missing <title>.")
 	}
-
-	doc.level = 0
-	doc.elems = 0
 	doc.linkText = make(map[*html.Node]int)
 	doc.normText = make(map[*html.Node]int)
 
+	doc.cleanBody(doc.body, 0)
 	doc.countText(doc.body, false)
 	doc.parseBody(doc.body)
 
@@ -110,8 +106,8 @@ func (doc *Document) setNodes(n *html.Node) {
 	}
 }
 
-// Parse the <head>...</head> part of the HTML page. This function only sets
-// the title string right now.
+// parseHead parses the <head>...</head> part of the HTML page. Right now it
+// only detects the <title>...</title>.
 func (doc *Document) parseHead(n *html.Node) {
 	if n.Type == html.ElementNode && n.Data == "title" {
 		if chunk, err := NewChunk(doc, n); err == nil {
@@ -156,91 +152,80 @@ func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, nor
 	return
 }
 
-// Parse the <body>...</body> part of the HTML page.
-func (doc *Document) parseBody(n *html.Node) {
-	doc.elems += 1
-	switch n.Type {
-	case html.ElementNode:
-		doc.level += 1
-		doc.parseBodyElement(n)
-		doc.level -= 1
-	case html.TextNode:
-		doc.parseBodyText(n)
+// cleanBody removes unwanted HTML elements from the HTML body.
+func (doc *Document) cleanBody(n *html.Node, level int) {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type != html.ElementNode {
+			continue
+		}
+		switch c.Data {
+		// Elements save to ignore.
+		case "address", "audio", "button", "canvas", "caption", "fieldset",
+			"figcaption", "figure", "footer", "form", "frame", "header", "iframe",
+			"map", "menu", "nav", "noscript", "object", "option", "output",
+			"script", "select", "style", "svg", "textarea", "video":
+			n.RemoveChild(c)
+		// High-level tables might be used to layout the document, so we better
+		// not ignore them.
+		case "table":
+			if level > 5 {
+				n.RemoveChild(c)
+			}
+		default:
+			doc.cleanBody(c, level+1)
+		}
 	}
 }
 
-func (doc *Document) parseBodyElement(n *html.Node) {
-	for _, attr := range n.Attr {
-		switch attr.Key {
-		case "id", "class", "itemprop":
-			if ignorePattern.FindStringIndex(attr.Val) != nil {
-				return
+// parseBody parses the <body>...</body> part of the HTML page. It creates
+// Chunks for every html.TextNode found in the body.
+func (doc *Document) parseBody(n *html.Node) {
+	switch n.Type {
+	case html.ElementNode:
+		// We ignore the node if it has some nasty classes/ids/itemprobs.
+		for _, attr := range n.Attr {
+			switch attr.Key {
+			case "id", "class", "itemprop":
+				if ignorePattern.FindStringIndex(attr.Val) != nil {
+					return
+				}
 			}
 		}
-	}
-
-	ancestorMask := 0
-	switch n.Data {
-	// We convert headings to text immediately. This is easier and feasible
-	// because headings don't contain many children.
-	// Descending into these children and handling every TextNode separately
-	// would make things unnecessary complicated and the result noisy.
-	case "h1", "h2", "h3", "h4", "h5", "h6", "a":
+		ancestorMask := 0
+		switch n.Data {
+		// We convert headings and links to text immediately. This is easier
+		// and feasible because headings and links don't contain many children.
+		// Descending into these children and handling every TextNode separately
+		// would make things unnecessary complicated and our results noisy.
+		case "h1", "h2", "h3", "h4", "h5", "h6", "a":
+			if chunk, err := NewChunk(doc, n); err == nil {
+				doc.Chunks = append(doc.Chunks, chunk)
+			}
+			return
+		// Now mask the element type, but only if it isn't already set.
+		// If we mask a bit which was already set by one of our callers, we'd also
+		// clear it at the of this function, though it actually should be cleared
+		// by the caller.
+		case "article":
+			ancestorMask = AncestorArticle &^ doc.ancestors
+		case "aside":
+			ancestorMask = AncestorAside &^ doc.ancestors
+		case "blockquote":
+			ancestorMask = AncestorBlockquote &^ doc.ancestors
+		case "ul", "ol":
+			ancestorMask = AncestorList &^ doc.ancestors
+		}
+		// Add our mask to the ancestor bitmask.
+		doc.ancestors |= ancestorMask
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			doc.parseBody(c)
+		}
+		// Remove our mask from the ancestor bitmask.
+		doc.ancestors &^= ancestorMask
+	case html.TextNode:
 		if chunk, err := NewChunk(doc, n); err == nil {
 			doc.Chunks = append(doc.Chunks, chunk)
 		}
-		return
-	// Elements save to ignore.
-	case "address", "audio", "button", "canvas", "caption", "fieldset",
-		"figcaption", "figure", "footer", "form", "frame", "header", "iframe",
-		"img", "map", "menu", "nav", "noscript", "object", "option", "output",
-		"script", "select", "style", "svg", "textarea", "video":
-		return
-	// High-level tables might be used to layout the document, so we better not
-	// ignore them.
-	case "table":
-		if doc.level > 5 {
-			return
-		}
-	// Now mask the element type, but only if it isn't already set.
-	// If we mask a bit which was already set by one of our callers, we'd also
-	// clear it at the of this function, though it actually should be cleared
-	// by the caller.
-	case "article":
-		ancestorMask = AncestorArticle &^ doc.ancestors
-	case "aside":
-		ancestorMask = AncestorAside &^ doc.ancestors
-	case "blockquote":
-		ancestorMask = AncestorBlockquote &^ doc.ancestors
-	case "ul", "ol":
-		ancestorMask = AncestorList &^ doc.ancestors
-	}
-
-	doc.ancestors |= ancestorMask
-	// If we reach this, we should descend.
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		doc.parseBody(c)
-	}
-	doc.ancestors &^= ancestorMask
-}
-
-func (doc *Document) parseBodyText(n *html.Node) {
-	// Only every 6th text node contains text in our training set.
-	// Since we don't need nodes that contain whitespace only, it's quite
-	// beneficial to ignore these nodes.
-	isWhitespace := true
-	for _, rune := range n.Data {
-		// The space is the greatest non printable ASCII character.
-		if rune > ' ' {
-			isWhitespace = false
-			break
-		}
-	}
-	if isWhitespace {
-		return
-	}
-	if chunk, err := NewChunk(doc, n); err == nil {
-		doc.Chunks = append(doc.Chunks, chunk)
 	}
 }
 

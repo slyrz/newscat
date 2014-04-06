@@ -22,8 +22,24 @@ Afterwards run
 
     go build github.com/slyrz/newscat
 
-to build newscat. A `newscat` binary file should now be present in your
-`$GOPATH/bin` directory.
+to build newscat. Your `$GOPATH/bin` directory should contain a `newscat`
+binary file afterwards.
+
+### Usage
+
+newscat accepts file paths and HTTP URLs as command line arguments.
+
+    newscat [PATH]... [URL]...
+
+If no arguments are passed, newscat expects HTML written to its
+standard input.
+
+    newscat < PATH
+
+It prints the extracted article text to standard output. If you want
+properly formatted paragraphs, pipe newscat's output to the `fmt` command.
+
+    newscat ... | fmt
 
 ### Training and Evaluation
 

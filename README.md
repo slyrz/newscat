@@ -4,11 +4,11 @@
 
 ### Overview
 
-newscat is a news content / article extractor written in just 1000
-lines of Go code. It tries to deliver the news article content while
-excluding clutter like image and video captions, editorial side notes,
-"related content" article teasers, advertisements, user comments and meta
-data.
+newscat provides fast and accurate news content / article extraction.
+
+It is trained to extract the news article content while excluding clutter like image
+and video captions, editorial side notes, "related content" article teasers,
+advertisements, user comments and meta data.
 
 ### Getting Started
 
@@ -18,9 +18,7 @@ To download newscat, run
 
 This will install newscat and, if not present, newscat's only non-standard
 build dependency - the `html` package from the
-[go.net networking libraries](http://code.google.com/p/go.net).
-
-Then run
+[go.net networking libraries](http://code.google.com/p/go.net). Then run
 
     go build github.com/slyrz/newscat
 
@@ -52,8 +50,8 @@ HTML5 data attribute to the elements containing relevant content.
 
 The data set was split into training and test data.
 50 randomly chosen news articles were used to train newscat. The remaining
-250 news articles were used to evaluate the rate the content
-extraction quality.
+250 news articles were used to evaluate the content extraction quality.
+
 For each news article, we compared the element-level predictions
 with the real labels and calculated precision, recall and the balanced F-score.
 

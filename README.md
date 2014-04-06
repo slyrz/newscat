@@ -1,3 +1,5 @@
+# newscat
+
 ![Logo](https://raw.github.com/slyrz/newscat/master/img/newscat_logo.png)
 
 ### Overview
@@ -18,12 +20,12 @@ This will install newscat and, if not present, newscat's only non-standard
 build dependency - the `html` package from the
 [go.net networking libraries](http://code.google.com/p/go.net).
 
-Afterwards run
+Then run
 
     go build github.com/slyrz/newscat
 
-to build newscat. Your `$GOPATH/bin` directory should contain a `newscat`
-binary file afterwards.
+to build newscat. This should produce a `newscat` binary file in your
+`$GOPATH/bin` directory.
 
 ### Usage
 

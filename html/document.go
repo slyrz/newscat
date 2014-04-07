@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	ignorePattern = regexp.MustCompile("(?i)comment|caption|credit|header|foot|blq-dotcom|story-feature|related")
+	ignorePattern = regexp.MustCompile("(?i)comment|caption|description|credit|foot|blq-dotcom|story-feature|related")
 )
 
 type Document struct {
@@ -160,9 +160,9 @@ func (doc *Document) cleanBody(n *html.Node, level int) {
 		switch c.Data {
 		// Elements save to ignore.
 		case "address", "audio", "button", "canvas", "caption", "fieldset",
-			"figcaption", "figure", "footer", "form", "frame", "header",
-			"iframe", "map", "menu", "nav", "noscript", "object", "option",
-			"output", "script", "select", "style", "svg", "textarea", "video":
+			"figcaption", "figure", "footer", "form", "frame", "iframe",
+			"map", "menu", "nav", "noscript", "object", "option", "output",
+			"script", "select", "style", "svg", "textarea", "video":
 			return true
 		// High-level tables might be used to layout the document, so we better
 		// not ignore them.

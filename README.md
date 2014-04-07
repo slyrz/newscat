@@ -5,10 +5,9 @@
 ### Overview
 
 newscat provides fast and accurate news content / article extraction.
-
-It is trained to extract the news article content while excluding clutter like image
-and video captions, editorial side notes, "related content" article teasers,
-advertisements, user comments and meta data.
+It is trained to extract the news article content while excluding clutter like
+image and video captions, editorial side notes, "related content" article
+teasers, advertisements, user comments and meta data.
 
 ### Getting Started
 

@@ -5,9 +5,9 @@
 ### Overview
 
 newscat provides fast and accurate news content / article extraction.
-It is trained to extract the news article content while excluding clutter like
-image and video captions, editorial side notes, "related content" article
-teasers, advertisements, user comments and meta data.
+It is trained to extract the contents of news articles, while excluding
+clutter like image and video captions, editorial side notes,
+related content, teasers, advertisements, user comments and meta data.
 
 ### Getting Started
 
@@ -15,9 +15,10 @@ To download newscat, run
 
     go get github.com/slyrz/newscat
 
-This will install newscat and, if not present, newscat's only non-standard
-build dependency - the `html` package from the
-[go.net networking libraries](http://code.google.com/p/go.net). Then run
+This will download the source code of newscat and, if not present,
+newscat's only non-standard build dependency - the `html` package from the
+[go.net networking libraries](http://code.google.com/p/go.net).
+Then run
 
     go build github.com/slyrz/newscat
 

@@ -1,48 +1,40 @@
 package model
 
 func decisionTreeA(s ScoreFeature) float32 {
-	if s[3] <= -0.2716 {
-		if s[4] <= 1.2448 {
-			if s[3] <= -2.1045 {
-				if s[0] <= 0.0121 {
-					if s[3] <= -4.2476 {
-						return 0.00571
+	if s[3] <= -0.3862 {
+		if s[7] <= 0.5278 {
+			if s[6] <= 1.2087 {
+				if s[4] <= -1.2038 {
+					if s[3] <= -2.3663 {
+						return 0.00024
 					} else {
-						return 0.04943
+						return 0.04396
 					}
 				} else {
-					return 0.00000
+					if s[3] <= -1.1462 {
+						return 0.03333
+					} else {
+						return 0.23438
+					}
 				}
 			} else {
-				if s[1] <= 6.5000 {
-					if s[5] <= 3.4038 {
-						return 0.05729
-					} else {
-						return 1.00000
-					}
+				if s[6] <= 1.2723 {
+					return 1.00000
 				} else {
-					if s[4] <= -1.5456 {
-						return 0.15942
+					if s[6] <= 2.7304 {
+						return 0.10000
 					} else {
-						return 0.39583
+						return 0.87500
 					}
 				}
 			}
 		} else {
-			if s[6] <= -6.5425 {
-				if s[7] <= 0.3889 {
-					if s[3] <= -1.0730 {
-						return 0.00000
-					} else {
-						return 1.00000
-					}
-				} else {
-					return 1.00000
-				}
+			if s[4] <= -4.2522 {
+				return 0.00000
 			} else {
-				if s[5] <= 1.0564 {
-					if s[0] <= 0.1389 {
-						return 1.00000
+				if s[7] <= 0.8819 {
+					if s[8] <= 0.5000 {
+						return 0.91667
 					} else {
 						return 0.00000
 					}
@@ -52,60 +44,56 @@ func decisionTreeA(s ScoreFeature) float32 {
 			}
 		}
 	} else {
-		if s[0] <= 0.3203 {
-			if s[4] <= 0.1740 {
-				if s[1] <= 5.5000 {
-					if s[0] <= 0.2088 {
-						return 0.36792
+		if s[0] <= 0.5708 {
+			if s[0] <= 0.2111 {
+				if s[6] <= 0.4546 {
+					if s[3] <= 9.5481 {
+						return 0.79129
 					} else {
-						return 0.07317
+						return 0.00000
 					}
 				} else {
-					if s[3] <= 2.5040 {
-						return 0.85714
+					if s[1] <= 5.5000 {
+						return 0.94768
 					} else {
-						return 0.35484
+						return 0.99327
 					}
 				}
 			} else {
-				if s[6] <= 0.8346 {
-					if s[1] <= 10.5000 {
-						return 0.54000
+				if s[4] <= 0.2819 {
+					if s[1] <= 3.5000 {
+						return 0.05455
 					} else {
-						return 0.97222
+						return 0.63636
 					}
 				} else {
-					if s[6] <= 1.7255 {
-						return 0.93243
+					if s[6] <= 0.0169 {
+						return 0.35294
 					} else {
-						return 0.99272
+						return 0.94231
 					}
 				}
 			}
 		} else {
-			if s[4] <= -0.7898 {
-				if s[5] <= -9.6139 {
-					if s[6] <= 0.8985 {
+			if s[2] <= 0.5000 {
+				if s[4] <= -1.7948 {
+					return 0.00000
+				} else {
+					if s[5] <= -7.2926 {
 						return 1.00000
 					} else {
-						return 0.00000
-					}
-				} else {
-					if s[4] <= -2.2444 {
-						return 0.00000
-					} else {
-						return 0.05882
+						return 0.09091
 					}
 				}
 			} else {
-				if s[5] <= -2.1776 {
-					return 0.00000
-				} else {
-					if s[3] <= 2.7204 {
-						return 0.93333
+				if s[1] <= 2.0000 {
+					if s[4] <= -2.6049 {
+						return 0.00000
 					} else {
-						return 0.48148
+						return 0.83333
 					}
+				} else {
+					return 0.00000
 				}
 			}
 		}
@@ -113,114 +101,122 @@ func decisionTreeA(s ScoreFeature) float32 {
 }
 
 func decisionTreeB(s ScoreFeature) float32 {
-	if s[4] <= -0.4148 {
-		if s[7] <= 0.4808 {
-			if s[4] <= -0.8557 {
-				if s[5] <= -4.4342 {
-					if s[3] <= -0.9614 {
-						return 0.00015
+	if s[3] <= -0.3947 {
+		if s[3] <= -2.1971 {
+			if s[7] <= 0.5085 {
+				if s[3] <= -2.8281 {
+					if s[8] <= 0.5000 {
+						return 0.00000
 					} else {
-						return 0.10870
+						return 0.00008
 					}
 				} else {
-					if s[6] <= 5.7963 {
-						return 0.02368
+					if s[5] <= 0.3348 {
+						return 0.00410
 					} else {
-						return 0.66667
+						return 0.41667
 					}
 				}
 			} else {
-				if s[3] <= -0.9612 {
-					if s[5] <= 2.1508 {
+				if s[3] <= -7.8933 {
+					if s[3] <= -8.9144 {
 						return 0.00000
 					} else {
-						return 1.00000
+						return 0.33333
 					}
 				} else {
-					if s[4] <= -0.5297 {
-						return 0.69231
+					if s[0] <= 0.5000 {
+						return 0.90698
 					} else {
-						return 0.21053
+						return 0.00000
 					}
 				}
 			}
 		} else {
-			if s[0] <= 0.5000 {
-				if s[7] <= 0.6833 {
-					if s[1] <= 6.5000 {
-						return 0.40000
+			if s[7] <= 0.4654 {
+				if s[1] <= 8.5000 {
+					if s[6] <= 2.0294 {
+						return 0.01031
 					} else {
-						return 1.00000
+						return 0.40000
 					}
 				} else {
-					if s[7] <= 0.8516 {
-						return 0.88235
+					if s[6] <= 1.1804 {
+						return 0.32787
 					} else {
 						return 1.00000
 					}
 				}
 			} else {
-				return 0.00000
+				if s[4] <= -1.6766 {
+					if s[4] <= -1.7941 {
+						return 1.00000
+					} else {
+						return 0.00000
+					}
+				} else {
+					return 1.00000
+				}
 			}
 		}
 	} else {
 		if s[2] <= 0.5000 {
-			if s[5] <= 0.8707 {
-				if s[1] <= 4.5000 {
-					if s[6] <= -0.4998 {
-						return 0.11765
+			if s[1] <= 0.5000 {
+				if s[0] <= 0.1925 {
+					if s[3] <= 2.0005 {
+						return 0.35714
 					} else {
-						return 0.75610
+						return 0.85714
 					}
 				} else {
-					if s[0] <= 0.1809 {
-						return 0.94915
+					if s[4] <= 0.3710 {
+						return 0.00000
 					} else {
-						return 0.58621
+						return 1.00000
 					}
 				}
 			} else {
-				if s[0] <= 0.4457 {
-					if s[6] <= -0.1776 {
-						return 0.47059
+				if s[6] <= -0.5957 {
+					if s[7] <= 0.1667 {
+						return 0.20243
 					} else {
-						return 0.97242
+						return 0.85714
 					}
 				} else {
-					if s[4] <= -0.0906 {
-						return 0.66667
+					if s[0] <= 0.5315 {
+						return 0.94863
 					} else {
 						return 0.00000
 					}
 				}
 			}
 		} else {
-			if s[6] <= 1.8217 {
-				if s[0] <= 0.2064 {
-					if s[3] <= -2.6603 {
-						return 0.25000
+			if s[6] <= 0.0795 {
+				if s[5] <= 0.5716 {
+					if s[3] <= 3.1659 {
+						return 0.53333
 					} else {
-						return 0.95652
+						return 0.84211
 					}
 				} else {
-					if s[5] <= 2.6558 {
-						return 0.71429
+					if s[0] <= 0.1921 {
+						return 0.91126
 					} else {
-						return 0.29412
+						return 0.21053
 					}
 				}
 			} else {
-				if s[6] <= 2.4924 {
-					if s[6] <= 2.4886 {
-						return 0.99160
-					} else {
+				if s[4] <= -0.0099 {
+					if s[5] <= -0.5010 {
 						return 0.00000
+					} else {
+						return 0.80000
 					}
 				} else {
-					if s[5] <= 2.4923 {
-						return 0.98701
+					if s[5] <= 3.6844 {
+						return 0.99020
 					} else {
-						return 0.99938
+						return 0.99800
 					}
 				}
 			}
@@ -229,102 +225,122 @@ func decisionTreeB(s ScoreFeature) float32 {
 }
 
 func decisionTreeC(s ScoreFeature) float32 {
-	if s[3] <= -0.2731 {
-		if s[7] <= 0.4226 {
-			if s[3] <= -1.0120 {
-				if s[5] <= 1.3194 {
-					if s[5] <= 0.5840 {
-						return 0.00069
+	if s[4] <= -0.2744 {
+		if s[5] <= -1.1648 {
+			if s[3] <= -2.1395 {
+				if s[4] <= -1.1941 {
+					if s[7] <= 0.4143 {
+						return 0.00012
 					} else {
-						return 0.20000
+						return 0.41818
 					}
 				} else {
-					if s[6] <= 0.1832 {
-						return 0.11111
+					if s[1] <= 4.0000 {
+						return 0.00000
 					} else {
-						return 1.00000
+						return 0.40000
 					}
 				}
 			} else {
-				if s[8] <= 0.5000 {
-					return 0.00000
+				if s[7] <= 0.6833 {
+					if s[1] <= 7.5000 {
+						return 0.03810
+					} else {
+						return 0.18571
+					}
 				} else {
-					if s[4] <= 2.3707 {
-						return 0.23232
+					if s[4] <= -1.6766 {
+						return 0.87500
 					} else {
 						return 1.00000
 					}
 				}
 			}
 		} else {
-			if s[7] <= 0.7386 {
-				if s[4] <= -4.8790 {
-					return 0.00000
-				} else {
-					return 1.00000
-				}
-			} else {
-				if s[0] <= 0.5000 {
-					if s[3] <= -1.7421 {
-						return 0.95122
+			if s[0] <= 0.4719 {
+				if s[4] <= -0.9828 {
+					if s[2] <= 3.5000 {
+						return 0.11290
 					} else {
-						return 0.36364
+						return 1.00000
 					}
 				} else {
+					if s[4] <= -0.6246 {
+						return 0.72414
+					} else {
+						return 0.38462
+					}
+				}
+			} else {
+				if s[4] <= -2.3035 {
 					return 0.00000
+				} else {
+					if s[1] <= 4.0000 {
+						return 0.00000
+					} else {
+						return 1.00000
+					}
 				}
 			}
 		}
 	} else {
-		if s[1] <= 8.5000 {
-			if s[0] <= 0.2804 {
-				if s[0] <= 0.0034 {
-					if s[6] <= -0.6916 {
-						return 0.28319
+		if s[6] <= 0.1953 {
+			if s[2] <= 0.5000 {
+				if s[3] <= -0.3820 {
+					if s[8] <= 0.5000 {
+						return 0.88235
 					} else {
-						return 0.88615
+						return 0.03279
 					}
 				} else {
-					if s[4] <= 0.0054 {
-						return 0.32500
+					if s[4] <= 2.7731 {
+						return 0.40000
 					} else {
-						return 0.96697
+						return 0.92453
 					}
 				}
 			} else {
-				if s[4] <= -0.4757 {
-					return 0.00000
-				} else {
-					if s[6] <= -0.4757 {
-						return 0.10000
-					} else {
-						return 0.83333
-					}
-				}
-			}
-		} else {
-			if s[3] <= 1.0331 {
-				if s[1] <= 77.5000 {
-					if s[6] <= 2.6772 {
-						return 0.93443
+				if s[3] <= 9.2629 {
+					if s[0] <= 0.2094 {
+						return 0.92256
 					} else {
 						return 0.55556
 					}
 				} else {
-					return 0.00000
+					if s[4] <= 8.9998 {
+						return 0.00000
+					} else {
+						return 1.00000
+					}
 				}
-			} else {
-				if s[6] <= 1.8217 {
-					if s[3] <= 9.4562 {
-						return 0.94724
+			}
+		} else {
+			if s[5] <= 1.8466 {
+				if s[6] <= 2.4708 {
+					if s[6] <= 1.8492 {
+						return 0.93827
+					} else {
+						return 0.74603
+					}
+				} else {
+					if s[7] <= 0.0556 {
+						return 0.98214
 					} else {
 						return 0.00000
 					}
-				} else {
-					if s[4] <= -1.1959 {
-						return 0.14286
+				}
+			} else {
+				if s[1] <= 0.5000 {
+					if s[6] <= 2.1239 {
+						return 0.66667
 					} else {
-						return 0.99858
+						return 0.91429
+					}
+				} else {
+					if s[3] <= -0.3097 {
+						return 0.83333
+					} else {
+						return 0.99539
 					}
 				}
 			}
@@ -333,82 +349,114 @@ func decisionTreeC(s ScoreFeature) float32 {
 }
 
 func decisionTreeD(s ScoreFeature) float32 {
-	if s[3] <= -0.4035 {
-		if s[6] <= 3.5171 {
-			if s[7] <= 0.5635 {
-				if s[6] <= 1.2242 {
-					if s[4] <= 3.4225 {
-						return 0.00078
-					} else {
-						return 1.00000
-					}
-				} else {
-					if s[6] <= 1.9923 {
-						return 0.60000
+	if s[6] <= -0.3259 {
+		if s[1] <= 23.5000 {
+			if s[4] <= -1.1462 {
+				if s[3] <= -3.1329 {
+					if s[0] <= 0.0064 {
+						return 0.00682
 					} else {
 						return 0.00000
 					}
+				} else {
+					if s[8] <= 0.5000 {
+						return 0.27273
+					} else {
+						return 0.01751
+					}
 				}
 			} else {
-				if s[1] <= 4.5000 {
-					return 1.00000
-				} else {
-					if s[6] <= -9.5202 {
-						return 0.62667
+				if s[7] <= 0.1944 {
+					if s[5] <= -0.2693 {
+						return 0.19797
 					} else {
-						return 0.21053
+						return 0.65258
+					}
+				} else {
+					if s[7] <= 0.7071 {
+						return 0.95000
+					} else {
+						return 1.00000
 					}
 				}
 			}
 		} else {
-			return 1.00000
-		}
-	} else {
-		if s[4] <= 0.1740 {
-			if s[4] <= -1.6099 {
-				if s[4] <= -2.5009 {
-					return 0.00000
+			if s[0] <= 0.0173 {
+				if s[3] <= 0.8481 {
+					if s[4] <= 3.3739 {
+						return 0.02703
+					} else {
+						return 1.00000
+					}
 				} else {
-					if s[6] <= -0.6116 {
+					if s[1] <= 24.5000 {
+						return 0.75000
+					} else {
+						return 1.00000
+					}
+				}
+			} else {
+				if s[0] <= 0.1828 {
+					if s[3] <= -0.6338 {
 						return 0.00000
 					} else {
 						return 0.66667
 					}
-				}
-			} else {
-				if s[7] <= 0.0417 {
-					if s[3] <= 3.4138 {
-						return 0.58333
-					} else {
-						return 0.10909
-					}
 				} else {
-					if s[8] <= 0.5000 {
+					return 0.00000
+				}
+			}
+		}
+	} else {
+		if s[3] <= -0.3159 {
+			if s[4] <= 0.8868 {
+				if s[4] <= -0.7887 {
+					return 0.00000
+				} else {
+					if s[4] <= -0.4415 {
 						return 1.00000
 					} else {
-						return 0.80000
+						return 0.00000
+					}
+				}
+			} else {
+				if s[1] <= 4.0000 {
+					if s[4] <= 1.7083 {
+						return 1.00000
+					} else {
+						return 0.00000
+					}
+				} else {
+					if s[4] <= 1.9133 {
+						return 0.66667
+					} else {
+						return 1.00000
 					}
 				}
 			}
 		} else {
-			if s[0] <= 0.3106 {
-				if s[5] <= -10.4613 {
-					return 0.00000
-				} else {
-					if s[5] <= 0.3013 {
-						return 0.92264
+			if s[0] <= 0.5708 {
+				if s[4] <= -0.0670 {
+					if s[5] <= -1.4960 {
+						return 0.40000
 					} else {
-						return 0.98185
+						return 0.67308
+					}
+				} else {
+					if s[6] <= 2.1934 {
+						return 0.92111
+					} else {
+						return 0.99313
 					}
 				}
 			} else {
-				if s[6] <= -0.4061 {
-					return 0.00000
+				if s[6] <= 0.1119 {
+					return 1.00000
 				} else {
-					if s[6] <= 4.1302 {
-						return 0.84000
+					if s[6] <= 0.7996 {
+						return 0.20000
 					} else {
-						return 0.14286
+						return 0.00000
 					}
 				}
 			}
@@ -417,117 +465,113 @@ func decisionTreeD(s ScoreFeature) float32 {
 }
 
 func decisionTreeE(s ScoreFeature) float32 {
-	if s[5] <= 0.3652 {
-		if s[4] <= -0.4725 {
-			if s[6] <= -0.5808 {
-				if s[1] <= 6.5000 {
-					if s[1] <= 4.5000 {
-						return 0.00012
+	if s[5] <= -0.3197 {
+		if s[4] <= 0.0749 {
+			if s[7] <= 0.5278 {
+				if s[5] <= -1.1732 {
+					if s[4] <= -1.6369 {
+						return 0.00048
 					} else {
-						return 0.00466
+						return 0.10526
 					}
 				} else {
-					if s[4] <= -2.1688 {
-						return 0.00561
+					if s[4] <= -0.9254 {
+						return 0.04545
 					} else {
-						return 0.30841
+						return 0.46154
 					}
 				}
 			} else {
-				if s[0] <= 0.0388 {
-					if s[5] <= -5.9371 {
-						return 0.66667
+				if s[3] <= -7.8343 {
+					if s[6] <= -10.4313 {
+						return 1.00000
 					} else {
-						return 0.00000
+						return 0.09524
 					}
 				} else {
-					if s[6] <= 2.4251 {
-						return 0.17647
+					if s[8] <= 0.5000 {
+						return 0.81176
 					} else {
-						return 0.04000
+						return 0.00000
 					}
 				}
 			}
 		} else {
-			if s[1] <= 4.5000 {
-				if s[6] <= -0.3646 {
-					if s[7] <= 0.5625 {
-						return 0.03947
+			if s[3] <= 2.4484 {
+				if s[1] <= 4.5000 {
+					if s[6] <= 0.7545 {
+						return 0.10938
 					} else {
-						return 1.00000
+						return 0.90909
 					}
 				} else {
-					if s[0] <= 0.0086 {
-						return 0.59091
+					if s[1] <= 30.5000 {
+						return 0.90741
 					} else {
-						return 0.88462
+						return 0.69565
 					}
 				}
 			} else {
-				if s[3] <= 0.8682 {
-					if s[1] <= 23.5000 {
-						return 0.91111
+				if s[0] <= 0.1994 {
+					if s[1] <= 118.5000 {
+						return 0.98500
 					} else {
-						return 0.28571
+						return 0.00000
 					}
 				} else {
-					if s[0] <= 0.2429 {
-						return 0.98381
+					if s[6] <= -0.5515 {
+						return 0.00000
 					} else {
-						return 0.66667
+						return 1.00000
 					}
 				}
 			}
 		}
 	} else {
-		if s[4] <= 0.3649 {
-			if s[1] <= 5.5000 {
-				if s[4] <= -1.6098 {
-					return 0.00000
-				} else {
-					if s[3] <= 2.3803 {
-						return 0.68182
+		if s[0] <= 0.4039 {
+			if s[4] <= 0.0957 {
+				if s[4] <= -0.9887 {
+					if s[4] <= -1.9570 {
+						return 0.02439
 					} else {
-						return 0.21311
+						return 0.21212
+					}
+				} else {
+					if s[3] <= -0.3521 {
+						return 0.07143
+					} else {
+						return 0.60938
 					}
 				}
 			} else {
-				if s[3] <= 2.8800 {
-					if s[1] <= 22.5000 {
-						return 0.75862
-					} else {
-						return 0.31250
-					}
-				} else {
-					if s[6] <= 6.1963 {
-						return 0.06061
+				if s[3] <= -0.3717 {
+					if s[4] <= 2.8786 {
+						return 0.23077
 					} else {
 						return 1.00000
+					}
+				} else {
+					if s[4] <= 2.7462 {
+						return 0.90988
+					} else {
+						return 0.99294
 					}
 				}
 			}
 		} else {
-			if s[1] <= 10.5000 {
-				if s[4] <= 2.6459 {
-					if s[6] <= 0.6877 {
-						return 0.56000
+			if s[4] <= -0.2872 {
+				if s[0] <= 0.8960 {
+					if s[0] <= 0.8516 {
+						return 0.04762
 					} else {
-						return 0.92288
+						return 1.00000
 					}
 				} else {
-					if s[4] <= 7.5746 {
-						return 0.99312
-					} else {
-						return 0.66667
-					}
+					return 0.00000
 				}
 			} else {
-				if s[1] <= 16.5000 {
-					if s[5] <= 8.3007 {
-						return 0.99150
-					} else {
-						return 0.80000
-					}
+				if s[0] <= 0.4280 {
+					return 0.00000
 				} else {
 					return 1.00000
 				}
@@ -537,218 +581,210 @@ func decisionTreeE(s ScoreFeature) float32 {
 }
 
 func decisionTreeF(s ScoreFeature) float32 {
-	if s[6] <= -0.1794 {
-		if s[5] <= 0.4207 {
-			if s[7] <= 0.4226 {
-				if s[4] <= 0.5737 {
-					if s[3] <= -0.9612 {
-						return 0.00064
+	if s[4] <= -0.3221 {
+		if s[3] <= -1.5563 {
+			if s[7] <= 0.5278 {
+				if s[4] <= -4.0405 {
+					if s[0] <= 0.0064 {
+						return 0.00060
 					} else {
-						return 0.15049
+						return 0.00000
 					}
 				} else {
-					if s[2] <= 0.5000 {
-						return 0.35897
+					if s[6] <= -11.5147 {
+						return 0.50000
 					} else {
-						return 0.88679
+						return 0.00476
 					}
 				}
 			} else {
 				if s[0] <= 0.5000 {
-					if s[7] <= 0.6833 {
-						return 0.71429
+					if s[1] <= 14.5000 {
+						return 0.94915
 					} else {
-						return 0.96875
+						return 0.00000
 					}
 				} else {
 					return 0.00000
 				}
 			}
 		} else {
-			if s[1] <= 9.5000 {
-				if s[3] <= 1.4948 {
-					if s[5] <= 1.8106 {
-						return 0.15789
+			if s[7] <= 0.2111 {
+				if s[1] <= 1.5000 {
+					if s[0] <= 0.1323 {
+						return 0.21429
 					} else {
-						return 0.00000
+						return 0.00746
 					}
 				} else {
-					if s[3] <= 1.6840 {
-						return 1.00000
+					if s[4] <= -1.3776 {
+						return 0.08966
 					} else {
-						return 0.39831
+						return 0.43820
 					}
 				}
 			} else {
-				if s[4] <= -0.1686 {
-					if s[1] <= 37.5000 {
-						return 0.90000
-					} else {
+				if s[4] <= -0.8691 {
+					if s[1] <= 6.5000 {
 						return 0.00000
-					}
-				} else {
-					if s[1] <= 13.5000 {
-						return 0.95652
 					} else {
 						return 1.00000
 					}
+				} else {
+					return 1.00000
 				}
 			}
 		}
 	} else {
-		if s[0] <= 0.3153 {
-			if s[0] <= 0.2118 {
-				if s[4] <= -0.2371 {
-					if s[6] <= 2.8454 {
-						return 0.23256
-					} else {
-						return 0.59259
-					}
+		if s[3] <= -0.3820 {
+			if s[0] <= 0.0020 {
+				if s[8] <= 0.5000 {
+					return 1.00000
 				} else {
-					if s[4] <= 2.8491 {
-						return 0.92916
-					} else {
-						return 0.99697
-					}
-				}
-			} else {
-				if s[3] <= 0.4711 {
-					return 0.00000
-				} else {
-					if s[3] <= 7.3554 {
-						return 0.92199
-					} else {
+					if s[3] <= -1.6602 {
 						return 0.00000
-					}
-				}
-			}
-		} else {
-			if s[0] <= 0.8128 {
-				if s[3] <= 3.7828 {
-					if s[4] <= 0.4937 {
-						return 0.21429
 					} else {
-						return 0.68750
-					}
-				} else {
-					if s[6] <= 1.4989 {
-						return 0.60000
-					} else {
-						return 1.00000
+						return 0.88889
 					}
 				}
 			} else {
 				return 0.00000
+			}
+		} else {
+			if s[1] <= 10.5000 {
+				if s[5] <= 0.0207 {
+					if s[6] <= -0.3356 {
+						return 0.51042
+					} else {
+						return 0.91525
+					}
+				} else {
+					if s[6] <= 0.3989 {
+						return 0.66364
+					} else {
+						return 0.96119
+					}
+				}
+			} else {
+				if s[4] <= 0.7371 {
+					if s[2] <= 2.5000 {
+						return 0.96667
+					} else {
+						return 0.37500
+					}
+				} else {
+					if s[5] <= -1.9185 {
+						return 0.97959
+					} else {
+						return 0.99811
+					}
+				}
 			}
 		}
 	}
 }
 
 func decisionTreeG(s ScoreFeature) float32 {
-	if s[4] <= -0.4061 {
-		if s[7] <= 0.4808 {
-			if s[6] <= -0.5717 {
-				if s[3] <= -2.2368 {
-					if s[1] <= 18.5000 {
-						return 0.00020
+	if s[4] <= -0.5334 {
+		if s[7] <= 0.7208 {
+			if s[3] <= -1.1440 {
+				if s[4] <= -3.3254 {
+					if s[5] <= -7.7420 {
+						return 0.00004
 					} else {
-						return 0.02020
+						return 0.00098
 					}
 				} else {
-					if s[2] <= 0.5000 {
-						return 0.01087
+					if s[3] <= -6.6074 {
+						return 0.21429
 					} else {
-						return 0.19091
+						return 0.02089
 					}
 				}
 			} else {
-				if s[0] <= 0.1966 {
-					if s[0] <= 0.1016 {
-						return 0.22581
+				if s[4] <= -1.6320 {
+					if s[0] <= 0.8655 {
+						return 0.08609
 					} else {
-						return 0.54545
+						return 0.00000
 					}
 				} else {
-					if s[4] <= -2.3075 {
-						return 0.00000
+					if s[5] <= -1.2892 {
+						return 0.16364
 					} else {
-						return 0.17647
+						return 0.63158
 					}
 				}
 			}
 		} else {
-			if s[4] <= -5.7248 {
-				return 0.00000
-			} else {
-				if s[3] <= -3.2988 {
-					if s[6] <= -6.0587 {
+			if s[8] <= 0.5000 {
+				if s[0] <= 0.5000 {
+					if s[4] <= -2.5196 {
 						return 1.00000
 					} else {
-						return 0.75000
+						return 0.93333
 					}
 				} else {
-					if s[1] <= 10.5000 {
-						return 0.78947
-					} else {
-						return 0.00000
-					}
+					return 0.00000
 				}
+			} else {
+				return 0.00000
 			}
 		}
 	} else {
-		if s[6] <= 0.6185 {
-			if s[3] <= -0.4086 {
-				if s[5] <= -9.4776 {
-					if s[7] <= 0.3625 {
+		if s[3] <= -0.3947 {
+			if s[1] <= 4.5000 {
+				if s[3] <= -1.5528 {
+					if s[1] <= 1.5000 {
+						return 0.09091
+					} else {
 						return 0.00000
+					}
+				} else {
+					return 0.00000
+				}
+			} else {
+				if s[1] <= 30.0000 {
+					if s[7] <= 0.2308 {
+						return 0.54545
 					} else {
 						return 1.00000
 					}
 				} else {
-					if s[1] <= 16.5000 {
+					if s[3] <= -1.6182 {
 						return 0.00000
 					} else {
-						return 0.66667
-					}
-				}
-			} else {
-				if s[1] <= 6.5000 {
-					if s[6] <= 0.1563 {
-						return 0.39655
-					} else {
-						return 0.94118
-					}
-				} else {
-					if s[3] <= 9.4562 {
-						return 0.95607
-					} else {
-						return 0.00000
+						return 1.00000
 					}
 				}
 			}
 		} else {
-			if s[4] <= 0.4454 {
-				if s[1] <= 0.5000 {
-					return 0.00000
+			if s[4] <= 1.2082 {
+				if s[4] <= -0.0692 {
+					if s[3] <= 3.3945 {
+						return 0.60000
+					} else {
+						return 0.12500
+					}
 				} else {
-					if s[6] <= 5.6754 {
-						return 0.75000
+					if s[4] <= 1.2002 {
+						return 0.79668
 					} else {
 						return 0.00000
 					}
 				}
 			} else {
-				if s[3] <= -0.4482 {
-					if s[0] <= 0.2004 {
-						return 1.00000
+				if s[2] <= 0.5000 {
+					if s[6] <= -3.2918 {
+						return 0.57353
 					} else {
-						return 0.00000
+						return 0.96531
 					}
 				} else {
-					if s[4] <= 2.8488 {
-						return 0.94652
+					if s[4] <= 3.0759 {
+						return 0.93878
 					} else {
-						return 0.99735
+						return 0.99820
 					}
 				}
 			}
@@ -757,115 +793,115 @@ func decisionTreeG(s ScoreFeature) float32 {
 }
 
 func decisionTreeH(s ScoreFeature) float32 {
-	if s[4] <= -0.2048 {
-		if s[4] <= -1.7600 {
-			if s[4] <= -2.2435 {
-				if s[4] <= -5.3684 {
-					if s[1] <= 15.5000 {
-						return 0.00000
+	if s[6] <= -0.5199 {
+		if s[4] <= -0.4941 {
+			if s[7] <= 0.5903 {
+				if s[6] <= -0.7673 {
+					if s[5] <= -0.3150 {
+						return 0.00095
 					} else {
-						return 0.00820
+						return 0.09302
 					}
 				} else {
-					if s[8] <= 0.5000 {
-						return 0.06426
+					if s[5] <= -1.4940 {
+						return 0.00000
 					} else {
-						return 0.00665
+						return 1.00000
 					}
 				}
 			} else {
-				if s[8] <= 0.5000 {
-					if s[7] <= 0.0833 {
-						return 0.00000
-					} else {
-						return 0.91667
-					}
+				if s[4] <= -4.3450 {
+					return 0.00000
 				} else {
-					if s[3] <= 1.3591 {
-						return 0.01149
+					if s[8] <= 0.5000 {
+						return 0.91228
 					} else {
-						return 0.14286
+						return 0.00000
 					}
 				}
 			}
 		} else {
-			if s[7] <= 0.1707 {
-				if s[4] <= -0.8554 {
-					if s[3] <= -1.0725 {
-						return 0.01351
+			if s[2] <= 0.5000 {
+				if s[1] <= 4.5000 {
+					if s[5] <= 2.8776 {
+						return 0.10317
 					} else {
-						return 0.38462
+						return 0.68000
 					}
 				} else {
-					if s[6] <= -0.8930 {
-						return 0.17308
+					if s[5] <= 6.6087 {
+						return 0.86792
 					} else {
-						return 0.55405
+						return 0.00000
 					}
 				}
 			} else {
-				if s[4] <= -1.6473 {
-					if s[3] <= -1.7421 {
-						return 1.00000
+				if s[4] <= 1.8552 {
+					if s[5] <= 4.7344 {
+						return 0.71014
 					} else {
-						return 0.25000
+						return 0.00000
 					}
 				} else {
-					if s[3] <= -0.4392 {
-						return 1.00000
+					if s[1] <= 122.5000 {
+						return 0.98347
 					} else {
-						return 0.66667
+						return 0.00000
 					}
 				}
 			}
 		}
 	} else {
-		if s[4] <= 1.3753 {
-			if s[1] <= 4.5000 {
-				if s[6] <= -0.1921 {
-					if s[5] <= 0.2530 {
+		if s[6] <= 1.1480 {
+			if s[1] <= 11.5000 {
+				if s[8] <= 0.5000 {
+					if s[7] <= 0.4375 {
 						return 0.00000
 					} else {
-						return 0.40000
+						return 1.00000
 					}
 				} else {
-					if s[5] <= -0.8756 {
-						return 0.60000
+					if s[4] <= -0.5639 {
+						return 0.07895
 					} else {
-						return 0.89565
+						return 0.72642
 					}
 				}
 			} else {
-				if s[3] <= 3.7472 {
-					if s[2] <= 1.5000 {
-						return 0.89524
-					} else {
-						return 0.66667
-					}
+				if s[3] <= -1.4803 {
+					return 0.00000
 				} else {
-					if s[8] <= 0.5000 {
-						return 1.00000
+					if s[0] <= 0.2286 {
+						return 0.98864
 					} else {
-						return 0.21429
+						return 0.71429
 					}
 				}
 			}
 		} else {
-			if s[3] <= -2.9204 {
-				if s[7] <= 0.3889 {
-					return 0.00000
+			if s[2] <= 0.5000 {
+				if s[4] <= -0.3207 {
+					if s[1] <= 2.5000 {
+						return 0.24242
+					} else {
+						return 0.09091
+					}
 				} else {
-					return 1.00000
+					if s[0] <= 0.3401 {
+						return 0.96939
+					} else {
+						return 0.33333
+					}
 				}
 			} else {
-				if s[5] <= -10.4613 {
-					return 0.00000
-				} else {
-					if s[2] <= 0.5000 {
-						return 0.94722
+				if s[0] <= 0.7851 {
+					if s[0] <= 0.1991 {
+						return 0.99723
 					} else {
-						return 0.99434
+						return 0.91379
 					}
+				} else {
+					return 0.00000
 				}
 			}
 		}
@@ -873,199 +909,195 @@ func decisionTreeH(s ScoreFeature) float32 {
 }
 
 func decisionTreeI(s ScoreFeature) float32 {
-	if s[6] <= 0.0204 {
-		if s[7] <= 0.4202 {
-			if s[5] <= 0.4354 {
-				if s[5] <= -1.1539 {
-					if s[4] <= 0.9511 {
-						return 0.00206
+	if s[6] <= -0.6143 {
+		if s[4] <= 0.0701 {
+			if s[4] <= -1.4301 {
+				if s[1] <= 4.5000 {
+					if s[7] <= 0.5000 {
+						return 0.00019
 					} else {
-						return 0.71642
+						return 0.66667
 					}
 				} else {
-					if s[4] <= -0.7898 {
-						return 0.01020
+					if s[7] <= 0.7208 {
+						return 0.00426
 					} else {
-						return 0.52941
+						return 0.72917
 					}
 				}
 			} else {
-				if s[4] <= 0.1323 {
-					if s[4] <= -1.7453 {
-						return 0.00000
+				if s[7] <= 0.1944 {
+					if s[5] <= 0.6110 {
+						return 0.11585
 					} else {
-						return 0.29091
+						return 0.48485
 					}
 				} else {
-					if s[0] <= 0.3066 {
-						return 0.88339
+					if s[7] <= 0.7136 {
+						return 0.76923
 					} else {
-						return 0.11111
+						return 1.00000
 					}
 				}
 			}
 		} else {
-			if s[0] <= 0.5000 {
-				if s[1] <= 8.5000 {
-					return 1.00000
-				} else {
-					if s[3] <= -3.1157 {
-						return 1.00000
+			if s[1] <= 5.5000 {
+				if s[4] <= 2.7743 {
+					if s[5] <= -0.7722 {
+						return 0.09677
 					} else {
-						return 0.76190
+						return 0.32500
+					}
+				} else {
+					if s[0] <= 0.0042 {
+						return 0.71429
+					} else {
+						return 1.00000
 					}
 				}
 			} else {
-				return 0.00000
+				if s[3] <= 1.7415 {
+					if s[4] <= 2.0333 {
+						return 0.78049
+					} else {
+						return 0.96875
+					}
+				} else {
+					if s[2] <= 0.5000 {
+						return 0.80000
+					} else {
+						return 0.95781
+					}
+				}
 			}
 		}
 	} else {
-		if s[4] <= -0.1993 {
-			if s[4] <= -0.8581 {
-				if s[3] <= 3.2651 {
-					if s[4] <= -2.4634 {
-						return 0.02439
+		if s[0] <= 0.5708 {
+			if s[5] <= 0.9372 {
+				if s[4] <= -0.3185 {
+					if s[3] <= -0.4605 {
+						return 0.02128
 					} else {
-						return 0.27273
+						return 0.35714
 					}
 				} else {
-					return 0.00000
+					if s[1] <= 6.5000 {
+						return 0.73333
+					} else {
+						return 0.96983
+					}
 				}
 			} else {
-				if s[2] <= 1.5000 {
-					if s[0] <= 0.2639 {
-						return 0.44828
+				if s[4] <= 0.0939 {
+					if s[3] <= 0.2322 {
+						return 0.00000
 					} else {
-						return 0.78571
+						return 0.71698
 					}
 				} else {
-					return 0.00000
+					if s[4] <= 2.4278 {
+						return 0.94074
+					} else {
+						return 0.99549
+					}
 				}
 			}
 		} else {
-			if s[0] <= 0.8128 {
-				if s[6] <= 1.8310 {
-					if s[5] <= -10.2741 {
-						return 0.00000
-					} else {
-						return 0.89362
-					}
-				} else {
-					if s[1] <= 1.5000 {
-						return 0.94224
-					} else {
-						return 0.99460
-					}
-				}
-			} else {
+			if s[3] <= 4.3146 {
 				return 0.00000
+			} else {
+				return 1.00000
 			}
 		}
 	}
 }
 
 func decisionTreeJ(s ScoreFeature) float32 {
-	if s[3] <= -0.2731 {
-		if s[7] <= 0.5635 {
-			if s[5] <= 1.2299 {
-				if s[4] <= -0.7024 {
-					if s[6] <= -1.7703 {
-						return 0.00040
+	if s[3] <= -0.3947 {
+		if s[6] <= 2.8786 {
+			if s[5] <= 3.0338 {
+				if s[7] <= 0.4530 {
+					if s[3] <= -1.5340 {
+						return 0.00032
 					} else {
-						return 0.05714
+						return 0.09924
 					}
 				} else {
-					if s[6] <= 0.9719 {
-						return 0.12644
+					if s[4] <= -4.0918 {
+						return 0.00000
 					} else {
-						return 0.63636
+						return 0.92632
 					}
 				}
 			} else {
-				if s[6] <= 1.4302 {
-					if s[6] <= 0.8863 {
-						return 0.46154
-					} else {
-						return 0.00000
-					}
-				} else {
+				if s[5] <= 3.8322 {
 					return 1.00000
+				} else {
+					return 0.00000
 				}
 			}
 		} else {
-			if s[8] <= 0.5000 {
-				if s[4] <= -5.4918 {
-					return 0.00000
-				} else {
-					if s[1] <= 8.5000 {
-						return 0.94444
-					} else {
-						return 0.68000
-					}
-				}
-			} else {
+			if s[1] <= 5.5000 {
 				return 0.00000
+			} else {
+				return 1.00000
 			}
 		}
 	} else {
-		if s[6] <= 0.1319 {
-			if s[1] <= 8.5000 {
-				if s[4] <= 1.3929 {
-					if s[6] <= -0.8554 {
-						return 0.09259
+		if s[0] <= 0.2829 {
+			if s[2] <= 0.5000 {
+				if s[6] <= -0.3500 {
+					if s[7] <= 0.2111 {
+						return 0.32432
 					} else {
-						return 0.41935
+						return 0.93333
 					}
 				} else {
-					if s[5] <= -2.1501 {
-						return 0.85714
+					if s[5] <= -0.3753 {
+						return 0.70000
 					} else {
-						return 0.53846
+						return 0.95877
 					}
 				}
 			} else {
-				if s[1] <= 10.5000 {
-					if s[8] <= 0.5000 {
+				if s[4] <= -0.9284 {
+					if s[3] <= 0.1626 {
 						return 1.00000
-					} else {
-						return 0.60526
-					}
-				} else {
-					if s[0] <= 0.2088 {
-						return 0.98013
-					} else {
-						return 0.33333
-					}
-				}
-			}
-		} else {
-			if s[4] <= -0.5005 {
-				if s[3] <= 2.9145 {
-					if s[0] <= 0.8115 {
-						return 0.41379
 					} else {
 						return 0.00000
 					}
 				} else {
-					if s[5] <= -9.5067 {
-						return 0.14286
+					if s[5] <= 2.4329 {
+						return 0.95769
 					} else {
-						return 0.02222
+						return 0.99232
+					}
+				}
+			}
+		} else {
+			if s[4] <= 0.0136 {
+				if s[4] <= -0.8832 {
+					if s[4] <= -2.1126 {
+						return 0.01149
+					} else {
+						return 0.07692
+					}
+				} else {
+					if s[2] <= 0.5000 {
+						return 0.07143
+					} else {
+						return 0.66667
 					}
 				}
 			} else {
-				if s[0] <= 0.3153 {
-					if s[1] <= 4.5000 {
-						return 0.95369
+				if s[7] <= 0.1500 {
+					if s[6] <= -0.0776 {
+						return 0.16667
 					} else {
-						return 0.99569
+						return 0.98182
 					}
 				} else {
-					if s[5] <= 1.1239 {
-						return 0.95238
-					} else {
-						return 0.44000
-					}
+					return 0.00000
 				}
 			}
 		}

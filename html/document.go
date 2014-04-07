@@ -3,6 +3,7 @@ package html
 import (
 	"code.google.com/p/go.net/html"
 	"errors"
+	"github.com/slyrz/newscat/util"
 	"io"
 	"regexp"
 	"unicode"
@@ -22,8 +23,8 @@ var (
 )
 
 type Document struct {
-	Title  *Chunk   // the <title>...</title> text
-	Chunks []*Chunk // list of all chunks found in this document
+	Title  *util.Text // the <title>...</title> text.
+	Chunks []*Chunk   // list of all chunks found in this document
 
 	// Unexported fields.
 	root *html.Node // the <html>...</html> part
@@ -63,11 +64,9 @@ func (doc *Document) Parse(r io.Reader) error {
 
 	doc.parseHead(doc.head)
 
-	// No title found? The title plays a crucial role in detecting
-	// the article content. We need it and every page should contain it.
-	// So skip parsing in case we could not find a title.
+	// If no title was found, detecting the main heading might fail.
 	if doc.Title == nil {
-		return errors.New("Document missing <title>.")
+		doc.Title = util.NewText()
 	}
 	doc.linkText = make(map[*html.Node]int)
 	doc.normText = make(map[*html.Node]int)
@@ -111,7 +110,7 @@ func (doc *Document) setNodes(n *html.Node) {
 func (doc *Document) parseHead(n *html.Node) {
 	if n.Type == html.ElementNode && n.Data == "title" {
 		if chunk, err := NewChunk(doc, n); err == nil {
-			doc.Title = chunk
+			doc.Title = chunk.Text
 		}
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {

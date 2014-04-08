@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	ignorePattern = regexp.MustCompile("(?i)comment|caption|description|credit|foot|blq-dotcom|story-feature|related")
+	ignorePattern = regexp.MustCompile("(?i)comment|community|caption|description|credit|foot|blq-dotcom|story-feature|related")
 )
 
 type Document struct {

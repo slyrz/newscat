@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/slyrz/newscat/html"
+	"github.com/slyrz/newscat/util"
 )
 
 const (
@@ -242,10 +243,10 @@ func (fw *ScoreFeatureWriter) WritePredictions(chunk *html.Chunk, predictions bo
 	fw.Write(predictions)
 }
 
-func (fw *ScoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *html.Chunk) {
+func (fw *ScoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *util.Text) {
 	switch chunk.Base.Data {
 	case "h1", "h2", "h3":
-		fw.Write(chunk.Text.Similarity(title.Text))
+		fw.Write(chunk.Text.Similarity(title))
 	default:
 		fw.Skip(1)
 	}

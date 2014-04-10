@@ -4,7 +4,7 @@ This file shows the extraction quality for pages from various websites.
 You should take these results with a grain of salt. They are more or less used
 for regression testing only.
 
-The results were obtained using newscat built from `2889719` commit.
+The results were obtained using newscat built from `f654de0` commit.
 
 |News                          |Website             |        |Pages   |F-Score |
 |:-----------------------------|:-------------------|:-------|-------:|-------:|
@@ -38,7 +38,8 @@ The results were obtained using newscat built from `2889719` commit.
 |Handelsblatt                  |handelsblatt.com    |DE      |2       |0.93    |
 |Heise                         |heise.de            |DE      |2       |0.96    |
 |Spiegel                       |spiegel.de          |DE      |3       |0.96    |
+|Tagesschau                    |tagesschau.de       |DE      |2       |1.00    |
 |Der Standard                  |derstandard.at      |AT      |2       |0.97    |
 |Neue Zürcher Zeitung          |ncc.ch              |CH      |2       |0.94    |
-|                              |                    |        |**56**  |**0.98**|
+|                              |                    |        |**58**  |**0.98**|
 

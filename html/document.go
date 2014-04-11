@@ -6,6 +6,7 @@ import (
 	"github.com/slyrz/newscat/util"
 	"io"
 	"regexp"
+	"strings"
 	"unicode"
 )
 
@@ -19,15 +20,39 @@ const (
 )
 
 var (
-	ignorePattern = regexp.MustCompile("(?i)comment|community|gallery|caption|description|credit|foot|story-feature|related|hide|hidden")
+	badNames *regexp.Regexp = nil
 )
+
+func init() {
+	// Create a case insensitive regular expression which matches all given
+	// arguments.
+	buildRegex := func(words ...string) *regexp.Regexp {
+		return regexp.MustCompile("(?i)" + strings.Join(words, "|"))
+	}
+
+	// If a class/id/itemprop value contains one of these words, we ignore the
+	// element and all of it's children. So chose the words wisely.
+	badNames = buildRegex(
+		"caption",
+		"comment",
+		"community",
+		"credit",
+		"description",
+		"foot",
+		"gallery",
+		"hidden",
+		"hide",
+		"related",
+		"story-feature",
+	)
+}
 
 type Document struct {
 	Title  *util.Text // the <title>...</title> text.
 	Chunks []*Chunk   // list of all chunks found in this document
 
 	// Unexported fields.
-	root *html.Node // the <html>...</html> part
+	html *html.Node // the <html>...</html> part
 	head *html.Node // the <head>...</head> part
 	body *html.Node // the <body>...</body> part
 
@@ -54,11 +79,11 @@ func (doc *Document) Parse(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	// Assign the fields root, head and body from the HTML page.
+	// Assign the fields html, head and body from the HTML page.
 	doc.setNodes(root)
 
 	// Check if <html>, <head> and <body> nodes were found.
-	if doc.root == nil || doc.head == nil || doc.body == nil {
+	if doc.html == nil || doc.head == nil || doc.body == nil {
 		return errors.New("Document missing <html>, <head> or <body>.")
 	}
 
@@ -87,15 +112,15 @@ func (doc *Document) Parse(r io.Reader) error {
 	return nil
 }
 
-// Assign the struct fields root, head and body from the HTML tree of node n.
-//  doc.root -> <html>
+// Assign the struct fields html, head and body from the HTML tree of node n.
+//  doc.html -> <html>
 //  doc.head -> <head>
 //  doc.body -> <body>
 func (doc *Document) setNodes(n *html.Node) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		switch c.Data {
 		case "html":
-			doc.root = c
+			doc.html = c
 			doc.setNodes(c)
 		case "body":
 			doc.body = c
@@ -197,7 +222,7 @@ func (doc *Document) parseBody(n *html.Node) {
 		for _, attr := range n.Attr {
 			switch attr.Key {
 			case "id", "class", "itemprop":
-				if ignorePattern.FindStringIndex(attr.Val) != nil {
+				if badNames.FindStringIndex(attr.Val) != nil {
 					return
 				}
 			}

@@ -40,7 +40,6 @@ func init() {
 		"description",
 		"foot",
 		"gallery",
-		"hidden",
 		"hide",
 		"related",
 		"story-feature",

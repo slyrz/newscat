@@ -33,6 +33,7 @@ func init() {
 	// If a class/id/itemprop value contains one of these words, we ignore the
 	// element and all of it's children. So chose the words wisely.
 	badNames = buildRegex(
+		"breadcrumb",
 		"caption",
 		"comment",
 		"community",

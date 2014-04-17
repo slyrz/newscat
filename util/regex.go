@@ -11,8 +11,6 @@ type Regex struct {
 
 // NewRegex creates a new Regex struct matching the given pattern.
 func NewRegex(pattern string) *Regex {
-	// Create a case insensitive regular expression which matches all given
-	// arguments.
 	return &Regex{regexp.MustCompile(pattern)}
 }
 

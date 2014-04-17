@@ -5,8 +5,6 @@ import (
 	"errors"
 	"github.com/slyrz/newscat/util"
 	"io"
-	"regexp"
-	"strings"
 	"unicode"
 )
 
@@ -18,34 +16,6 @@ const (
 	AncestorBlockquote
 	AncestorList
 )
-
-var (
-	badNames *regexp.Regexp = nil
-)
-
-func init() {
-	// Create a case insensitive regular expression which matches all given
-	// arguments.
-	buildRegex := func(words ...string) *regexp.Regexp {
-		return regexp.MustCompile("(?i)" + strings.Join(words, "|"))
-	}
-
-	// If a class/id/itemprop value contains one of these words, we ignore the
-	// element and all of it's children. So chose the words wisely.
-	badNames = buildRegex(
-		"breadcrumb",
-		"caption",
-		"comment",
-		"community",
-		"credit",
-		"description",
-		"foot",
-		"gallery",
-		"hide",
-		"related",
-		"story-feature",
-	)
-}
 
 type Document struct {
 	Title  *util.Text // the <title>...</title> text.
@@ -213,16 +183,38 @@ func (doc *Document) cleanBody(n *html.Node, level int) {
 	}
 }
 
+var (
+	ignoreNames = util.NewRegexFromWords(
+		"breadcrumb",
+		"caption",
+		"comment",
+		"community",
+		"credit",
+		"description",
+		"foot",
+		"gallery",
+		"hide",
+		"related",
+		"story-feature",
+	)
+	ignoreStyle = util.NewRegex(`(?i)display:\s*none`)
+)
+
 // parseBody parses the <body>...</body> part of the HTML page. It creates
 // Chunks for every html.TextNode found in the body.
 func (doc *Document) parseBody(n *html.Node) {
 	switch n.Type {
 	case html.ElementNode:
-		// We ignore the node if it has some nasty classes/ids/itemprobs.
+		// We ignore the node if it has some nasty classes/ids/itemprobs or if
+		// it contains "display: none" in its style attribute.
 		for _, attr := range n.Attr {
 			switch attr.Key {
 			case "id", "class", "itemprop":
-				if badNames.FindStringIndex(attr.Val) != nil {
+				if ignoreNames.In(attr.Val) {
+					return
+				}
+			case "style":
+				if ignoreStyle.In(attr.Val) {
 					return
 				}
 			}

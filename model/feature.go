@@ -3,11 +3,47 @@ package model
 import (
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/util"
+	// "fmt"
 )
 
 const (
-	numChunkFeatureComp = 37
-	numScoreFeatureComp = 9
+	numChunkFeatureComp = 36
+	numScoreFeatureComp = 11
+)
+
+var (
+	goodQualClass = util.NewRegexFromWords(
+		"article",
+		"catchline",
+		"content",
+		"head",
+		"introduction",
+		"leadin",
+		"main",
+		"post",
+		"story",
+		"summary",
+	)
+	poorQualClass = util.NewRegexFromWords(
+		"author",
+		"blog",
+		"byline",
+		"caption",
+		"col",
+		"comment",
+		"description",
+		"email",
+		"excerpt",
+		"image",
+		"info",
+		"menu",
+		"metadata",
+		"nav",
+		"photo",
+		"small",
+		"teaser",
+		"widget",
+	)
 )
 
 // Feature represents a feature vector.
@@ -154,36 +190,14 @@ func (fw *ChunkFeatureWriter) WriteTextStatSiblings(chunk *html.Chunk) {
 	}
 }
 
-var classQuality = map[string]int{
-	"article":      +1,
-	"content":      +1,
-	"headline":     +1,
-	"main-content": +1,
-	"post":         +1,
-	"story":        +1,
-	"story-body":   +1,
-	"blog":         -1,
-	"caption":      -1,
-	"col":          -1,
-	"comment":      -1,
-	"info":         -1,
-	"menu":         -1,
-	"metadata":     -1,
-	"nav":          -1,
-	"navigation":   -1,
-	"widget":       -1,
-}
-
 func (fw *ChunkFeatureWriter) WriteClassStat(chunk *html.Chunk, classes map[string]*html.TextStat) {
 	var best *html.TextStat = nil
-	var qual int = 0
 	for _, class := range chunk.Classes {
 		if stat, ok := classes[class]; ok {
 			if best == nil || (stat.Words/stat.Count) > (best.Words/best.Count) {
 				best = stat
 			}
 		}
-		qual += classQuality[class]
 	}
 	if best != nil {
 		fw.Write(true)
@@ -193,7 +207,6 @@ func (fw *ChunkFeatureWriter) WriteClassStat(chunk *html.Chunk, classes map[stri
 		fw.Write(false)
 		fw.Skip(2)
 	}
-	fw.Write(qual > 0)
 }
 
 func (fw *ChunkFeatureWriter) WriteClusterStat(chunk *html.Chunk, clusters map[*html.Chunk]*html.TextStat) {
@@ -213,9 +226,17 @@ type ScoreFeatureWriter struct {
 }
 
 func (fw *ScoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
+	goodQual := false
+	poorQual := false
+	for _, class := range chunk.Classes {
+		goodQual = goodQual || goodQualClass.In(class)
+		poorQual = poorQual || poorQualClass.In(class)
+	}
 	fw.Write(chunk.LinkText)
 	fw.Write(chunk.Text.Words)
 	fw.Write(chunk.Text.Sentences)
+	fw.Write(goodQual)
+	fw.Write(poorQual)
 }
 
 func (fw *ScoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *Cluster) {

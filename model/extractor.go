@@ -1,6 +1,7 @@
 package model
 
 import (
+	_ "fmt"
 	"github.com/slyrz/newscat/html"
 )
 
@@ -76,25 +77,31 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 	// Now we cluster Chunks by Containers to calculate average score per
 	// container.
-	clusters := NewClusters()
+	clusterContainer := NewClusters()
 	for i := 0; i < len(chunkFeatures); i++ {
 		chunk := doc.Chunks[i]
 		score := chunkFeatures[i].Score()
-		clusters.Add(chunk.Container, chunk, score)
+		clusterContainer.Add(chunk.Container, chunk, score)
 	}
-
-	result := make([]*html.Chunk, 0, 8)
 
 	scoreFeatureWriter := new(ScoreFeatureWriter)
 	for i, chunk := range doc.Chunks {
 		scoreFeatureWriter.Assign(scoreFeatures[i][:])
 		scoreFeatureWriter.WriteChunk(chunk)
-		scoreFeatureWriter.WriteCluster(chunk, clusters[chunk.Container])
+		scoreFeatureWriter.WriteCluster(chunk, clusterContainer[chunk.Container])
 		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
-		scoreFeatureWriter.WritePredictions(chunk, len(result) > 0)
+	}
 
-		if scoreFeatures[i].Predict() {
-			result = append(result, doc.Chunks[i])
+	// Keep blocks together.
+	clusterBlock := NewClusters()
+	for i, chunk := range doc.Chunks {
+		clusterBlock.Add(chunk.Block, chunk, scoreFeatures[i].Score(), float32(chunk.Text.Len()))
+	}
+
+	result := make([]*html.Chunk, 0, 8)
+	for _, chunk := range doc.Chunks {
+		if clusterBlock[chunk.Block].Score() > 0.5 {
+			result = append(result, chunk)
 		}
 	}
 

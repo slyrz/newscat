@@ -8,7 +8,7 @@ import (
 
 const (
 	numChunkFeatureComp = 36
-	numScoreFeatureComp = 11
+	numScoreFeatureComp = 10
 )
 
 var (
@@ -246,7 +246,7 @@ func (fw *ScoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *Cluster) 
 			break
 		}
 	}
-	fw.Write(cluster.ScoreAvg)
+	fw.Write(cluster.Score())
 	fw.Write(cluster.Scores[i])
 	if i > 0 {
 		fw.Write(cluster.Scores[i-1])
@@ -258,10 +258,6 @@ func (fw *ScoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *Cluster) 
 	} else {
 		fw.Write(-10)
 	}
-}
-
-func (fw *ScoreFeatureWriter) WritePredictions(chunk *html.Chunk, predictions bool) {
-	fw.Write(predictions)
 }
 
 func (fw *ScoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *util.Text) {

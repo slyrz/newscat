@@ -196,8 +196,9 @@ var (
 		"foot",
 		"gallery",
 		"hide",
-		"related",
 		"photo",
+		"related",
+		"social",
 		"story[-_]?bar",
 		"story[-_]?feature",
 	)

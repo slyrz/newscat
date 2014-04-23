@@ -186,17 +186,20 @@ func (doc *Document) cleanBody(n *html.Node, level int) {
 var (
 	ignoreNames = util.NewRegexFromWords(
 		"breadcrumb",
+		"byline",
 		"caption",
 		"comment",
 		"community",
 		"credit",
 		"description",
+		"email",
 		"foot",
 		"gallery",
 		"hide",
 		"related",
-		"story-feature",
-		"storybar",
+		"photo",
+		"story[-_]?bar",
+		"story[-_]?feature",
 	)
 	ignoreStyle = util.NewRegex(`(?i)display:\s*none`)
 )

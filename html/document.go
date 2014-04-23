@@ -196,6 +196,7 @@ var (
 		"hide",
 		"related",
 		"story-feature",
+		"storybar",
 	)
 	ignoreStyle = util.NewRegex(`(?i)display:\s*none`)
 )

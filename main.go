@@ -15,17 +15,17 @@ func printChunks(chunks []*html.Chunk) {
 	for _, chunk := range chunks {
 		delim, pre, pos := "", "", ""
 		// If the last chunk and the current chunk are part of the same HTML block,
-		// we seperate them by a space character. If they are in different blocks,
-		// we use two newline characters.
-		switch {
-		case last == nil:
-			delim = ""
-		case last.Block != chunk.Block:
-			delim = "\n\n"
-		case last.Block == chunk.Block:
-			delim = " "
+		// separate them by a space character. Otherwise use two newline characters
+		// to create a new paragraph.
+		if last != nil {
+			switch {
+			case last.Block != chunk.Block:
+				delim = "\n\n"
+			case last.Block == chunk.Block:
+				delim = " "
+			}
 		}
-		// Use bold font for headings, emphasized and bold text.
+		// Print headings and emphasized text bold.
 		switch chunk.Base.Data {
 		case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
 			pre, pos = "\x1b[39;1m", "\x1b[0m"
@@ -40,8 +40,8 @@ func printChunks(chunks []*html.Chunk) {
 
 func main() {
 	inputData := make(chan io.Reader, 4)
-	// Open all input (either paths / URLs passed as command line arguments or
-	// read from stdin) and write it to inputData channel.
+	// Open all input (file paths or URLs) or read from stdin and write the
+	// corresponding io.Readers to the inputData channel.
 	go func() {
 		if args := os.Args[1:]; len(args) > 0 {
 			for _, arg := range args {
@@ -64,7 +64,7 @@ func main() {
 	ext := model.NewExtractor()
 	// Read input from inputData channel and perform content extraction.
 	for data := range inputData {
-		// TODO: Warn if parsing Document failed.
+		// TODO: Warn if parsing document failed.
 		if doc, err := html.NewDocument(data); err == nil {
 			// TODO: Print warning if no chunks were extracted.
 			if chunks := ext.Extract(doc); len(chunks) > 0 {

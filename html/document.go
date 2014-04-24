@@ -198,6 +198,7 @@ var (
 		"hide",
 		"photo",
 		"related",
+		"shares",
 		"social",
 		"story[-_]?bar",
 		"story[-_]?feature",

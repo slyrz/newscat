@@ -196,6 +196,7 @@ var (
 		"foot",
 		"gallery",
 		"hide",
+		"infotext",
 		"photo",
 		"related",
 		"shares",

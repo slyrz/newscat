@@ -17,6 +17,7 @@ var (
 		"catchline",
 		"content",
 		"head",
+		"intro",
 		"introduction",
 		"leadin",
 		"main",

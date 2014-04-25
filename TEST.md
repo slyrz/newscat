@@ -4,7 +4,7 @@ This file shows the extraction quality for pages from various websites.
 You should take these results with a grain of salt. They are more or less used
 for regression testing only.
 
-The results were obtained using newscat built from `44f4a77` commit.
+The results were obtained using newscat built from `8605afb` commit.
 
 |News                          |Website                       |          |Pages     |TP        |TN        |FP        |FN        |F-Score   |
 |:-----------------------------|:-----------------------------|:---------|---------:|---------:|---------:|---------:|---------:|---------:|
@@ -67,16 +67,21 @@ The results were obtained using newscat built from `44f4a77` commit.
 |Vancouver Sun                 |vancouversun.com              |CA        |2         |52        |477       |0         |2         |0.98      |
 |Winnipeg Free Press           |winnipegfreepress.com         |CA        |2         |42        |427       |0         |1         |0.99      |
 |Bild                          |bild.de                       |DE        |3         |59        |200       |0         |6         |0.95      |
+|CICERO                        |cicero.de                     |DE        |2         |44        |180       |1         |2         |0.97      |
 |Der Freitag                   |freitag.de                    |DE        |2         |26        |109       |0         |1         |0.98      |
 |Der Tagesspiegel              |tagesspiegel.de               |DE        |2         |33        |215       |2         |0         |0.97      |
 |Die Zeit                      |zeit.de                       |DE        |2         |45        |309       |2         |1         |0.97      |
 |Focus                         |focus.de                      |DE        |3         |41        |331       |2         |5         |0.92      |
 |Frankfurter Allgemeine        |faz.net                       |DE        |2         |16        |476       |0         |0         |1.00      |
+|Frankfurter Rundschau         |fr-online.de                  |DE        |2         |29        |499       |0         |0         |1.00      |
 |Handelsblatt                  |handelsblatt.com              |DE        |2         |35        |248       |1         |3         |0.95      |
 |Heise                         |heise.de                      |DE        |2         |67        |396       |5         |5         |0.93      |
+|NEON                          |neon.de                       |DE        |2         |20        |103       |0         |0         |1.00      |
 |Spiegel                       |spiegel.de                    |DE        |3         |71        |688       |0         |5         |0.97      |
+|Stern                         |stern.de                      |DE        |2         |27        |290       |0         |1         |0.98      |
+|Süddeutsche Zeitung Magazin   |sz-magazin.de                 |DE        |2         |42        |139       |1         |4         |0.94      |
 |Tagesschau                    |tagesschau.de                 |DE        |2         |30        |136       |0         |0         |1.00      |
 |Der Standard                  |derstandard.at                |AT        |2         |29        |411       |0         |1         |0.98      |
 |Neue Zürcher Zeitung          |ncc.ch                        |CH        |2         |30        |128       |1         |3         |0.94      |
-|                              |                              |          |*147*     |*3531*    |*20532*   |*51*      |*95*      |**0.98**  |
+|                              |                              |          |*157*     |*3693*    |*21743*   |*53*      |*102*     |**0.98**  |
 

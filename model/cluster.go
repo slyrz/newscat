@@ -71,7 +71,7 @@ func (cl ClusterMap) Add(key *gonet.Node, chunk *html.Chunk, args ...float32) {
 	cluster, ok := cl[key]
 	if !ok {
 		cluster = NewCluster()
-		cl[base] = cluster
+		cl[key] = cluster
 	}
 	cluster.Add(chunk, args...)
 }

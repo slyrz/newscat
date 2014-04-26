@@ -17,9 +17,10 @@ const (
 	AncestorList
 )
 
+// A Document is a parsed HTML document.
 type Document struct {
 	Title  *util.Text // the <title>...</title> text.
-	Chunks []*Chunk   // list of all chunks found in this document
+	Chunks []*Chunk   // all chunks found in this document
 
 	// Unexported fields.
 	html *html.Node // the <html>...</html> part
@@ -35,16 +36,18 @@ type Document struct {
 	normText map[*html.Node]int // length of text outside <a></a> tags
 }
 
+// NewDocument creates a new document by parsing the HTML page
+// provided by r.
 func NewDocument(r io.Reader) (*Document, error) {
 	doc := new(Document)
 	doc.Chunks = make([]*Chunk, 0, 512)
-	if err := doc.Parse(r); err != nil {
+	if err := doc.parse(r); err != nil {
 		return nil, err
 	}
 	return doc, nil
 }
 
-func (doc *Document) Parse(r io.Reader) error {
+func (doc *Document) parse(r io.Reader) error {
 	root, err := html.Parse(r)
 	if err != nil {
 		return err
@@ -70,22 +73,21 @@ func (doc *Document) Parse(r io.Reader) error {
 	doc.countText(doc.body, false)
 	doc.parseBody(doc.body)
 
-	// Now link the chunks.
+	// Now we link the chunks.
+	min, max := 0, len(doc.Chunks)-1
 	for i := range doc.Chunks {
-		if i > 0 {
+		if i > min {
 			doc.Chunks[i].Prev = doc.Chunks[i-1]
 		}
-		if i < len(doc.Chunks)-1 {
+		if i < max {
 			doc.Chunks[i].Next = doc.Chunks[i+1]
 		}
 	}
 	return nil
 }
 
-// Assign the struct fields html, head and body from the HTML tree of node n.
-//  doc.html -> <html>
-//  doc.head -> <head>
-//  doc.body -> <body>
+// Assign the struct fields html, head and body to their corresponding
+// HTML nodes.
 func (doc *Document) setNodes(n *html.Node) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		switch c.Data {
@@ -101,7 +103,7 @@ func (doc *Document) setNodes(n *html.Node) {
 }
 
 // parseHead parses the <head>...</head> part of the HTML page. Right now it
-// only detects the <title>...</title>.
+// is only used to detect the page title.
 func (doc *Document) parseHead(n *html.Node) {
 	if n.Type == html.ElementNode && n.Data == "title" {
 		if chunk, err := NewChunk(doc, n); err == nil {
@@ -113,10 +115,9 @@ func (doc *Document) parseHead(n *html.Node) {
 	}
 }
 
-// countText counts the link text and the normal text per html.Node.
-// "Link text" is text inside <a> tags and "normal text" is text inside
-// anything but <a> tags. Of course, counting is done cumulative, so the
-// numbers of a parent node include the numbers of it's child nodes.
+// countText counts the text inside of links and the text outside of links
+// per html.Node. Counting is done cumulative, so the umbers of a parent node
+// include the numbers of it's child nodes.
 func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, normText int) {
 	linkText = 0
 	normText = 0
@@ -264,10 +265,11 @@ func (doc *Document) parseBody(n *html.Node) {
 	}
 }
 
+// TextStat contains the number of words and sentences found in text.
 type TextStat struct {
-	Words     int
-	Sentences int
-	Count     int
+	Words     int // total number of words
+	Sentences int // total number of sentences
+	Count     int // number of texts used to calculate this stats
 }
 
 // GetClassStats groups the document chunks by their classes (defined by the
@@ -291,7 +293,7 @@ func (doc *Document) GetClassStats() map[string]*TextStat {
 // GetClusterStats groups the document chunks by common ancestors and
 // calculates TextStats for each group of chunks.
 func (doc *Document) GetClusterStats() map[*Chunk]*TextStat {
-	// Don't ascend further than this constant.
+	// Don't ascend further than this.
 	const maxAncestors = 3
 
 	// Count TextStats for Chunk ancestors.

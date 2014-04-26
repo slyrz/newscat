@@ -5,11 +5,14 @@ import (
 	"github.com/slyrz/newscat/html"
 )
 
+// Extractor utilizes the trained model to extract relevant html.Chunks from
+// an html.Document.
 type Extractor struct {
 	ChunkFeatures []ChunkFeature
 	ScoreFeatures []ScoreFeature
 }
 
+// NewExtractor creates and initalizes a new Extractor.
 func NewExtractor() *Extractor {
 	return new(Extractor)
 }
@@ -37,8 +40,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		// Fill the i-th feature based on the current chunk.
 		chunkFeatureWriter.Assign(chunkFeatures[i][:])
 
-		// Let the generator fill the current feature vector with our
-		// observations.
+		// Write the observations to the feature vector.
 		chunkFeatureWriter.WriteElementType(chunk)
 		chunkFeatureWriter.WriteParentType(chunk)
 		chunkFeatureWriter.WriteSiblingTypes(chunk)
@@ -77,11 +79,9 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 	// Now we cluster Chunks by Containers to calculate average score per
 	// container.
-	clusterContainer := NewClusters()
-	for i := 0; i < len(chunkFeatures); i++ {
-		chunk := doc.Chunks[i]
-		score := chunkFeatures[i].Score()
-		clusterContainer.Add(chunk.Container, chunk, score)
+	clusterContainer := NewClusterMap()
+	for i, chunk := range doc.Chunks {
+		clusterContainer.Add(chunk.Container, chunk, chunkFeatures[i].Score())
 	}
 
 	scoreFeatureWriter := new(ScoreFeatureWriter)
@@ -92,12 +92,12 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 	}
 
-	// Keep blocks together.
-	clusterBlock := NewClusters()
+	clusterBlock := NewClusterMap()
 	for i, chunk := range doc.Chunks {
 		clusterBlock.Add(chunk.Block, chunk, scoreFeatures[i].Score(), float32(chunk.Text.Len()))
 	}
 
+	// Keep blocks together.
 	result := make([]*html.Chunk, 0, 8)
 	for _, chunk := range doc.Chunks {
 		if clusterBlock[chunk.Block].Score() > 0.5 {

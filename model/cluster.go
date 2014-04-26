@@ -5,17 +5,20 @@ import (
 	"github.com/slyrz/newscat/html"
 )
 
-type Clusters map[*gonet.Node]*Cluster
+// A ClusterMap groups Clusters by HTML nodes.
+type ClusterMap map[*gonet.Node]*Cluster
 
+// A Cluster stores a group of html.Chunks and their scores.
 type Cluster struct {
 	Chunks  []*html.Chunk
 	Scores  []float32
 	Weights []float32
 	// Unexported fields.
-	average float32
-	changed bool
+	average float32 // weighted average score
+	changed bool    // denotes struct changes after average calculation
 }
 
+// NewCluster creates and initalizes a new Cluster.
 func NewCluster() *Cluster {
 	result := new(Cluster)
 	result.Chunks = make([]*html.Chunk, 0)
@@ -24,6 +27,8 @@ func NewCluster() *Cluster {
 	return result
 }
 
+// Add adds the html.Chunk chunk to the Cluster. The variadic float32 parameter
+// args must either be (score,) or (score, weight).
 func (cl *Cluster) Add(chunk *html.Chunk, args ...float32) {
 	var score float32 = 0.0
 	var weight float32 = 0.0
@@ -33,7 +38,7 @@ func (cl *Cluster) Add(chunk *html.Chunk, args ...float32) {
 	case 1:
 		score, weight = args[0], 1.0
 	default:
-		panic("Call Add(chunk, score) or Add(chunk, score, weight)")
+		panic("call Add(chunk, score) or Add(chunk, score, weight)")
 	}
 	cl.Chunks = append(cl.Chunks, chunk)
 	cl.Scores = append(cl.Scores, score)
@@ -41,6 +46,7 @@ func (cl *Cluster) Add(chunk *html.Chunk, args ...float32) {
 	cl.changed = true
 }
 
+// Score calculates the weighted average of all chunk scores in Cluster.
 func (cl *Cluster) Score() float32 {
 	if cl.changed {
 		var s float32 = 0.0
@@ -55,12 +61,14 @@ func (cl *Cluster) Score() float32 {
 	return cl.average
 }
 
-func NewClusters() Clusters {
-	return make(Clusters)
+// NewClusterMap creates and initalizes a new ClusterMap.
+func NewClusterMap() ClusterMap {
+	return make(ClusterMap)
 }
 
-func (cl Clusters) Add(base *gonet.Node, chunk *html.Chunk, args ...float32) {
-	cluster, ok := cl[base]
+// Add adds the html.Chunk chunk to the Cluster indexed by key.
+func (cl ClusterMap) Add(key *gonet.Node, chunk *html.Chunk, args ...float32) {
+	cluster, ok := cl[key]
 	if !ok {
 		cluster = NewCluster()
 		cl[base] = cluster

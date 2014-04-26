@@ -7,8 +7,11 @@ import (
 	"strings"
 )
 
-// A Chunk combines the text of one or more html.TextNodes.
-// Whitespace-only text gets ignored and won't result in a Chunk.
+// A Chunk is a chunk of consecutive text found in the HTML document.
+// It combines the content of one or more html.TextNodes. Whitespace is
+// ignored, but interword spaces are preserved. Therefore each Chunk
+// must contain actual text and whitespace-only html.TextNodes don't
+// result Chunks.
 type Chunk struct {
 	Prev      *Chunk     // previous chunk
 	Next      *Chunk     // next chunk
@@ -66,10 +69,37 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 		return nil, errors.New("no text")
 	}
 
-	// Find the block level container of base.
-	chunk.Block = getParentBlock(chunk.Base)
+	// Now we detect the HTML block and container of the base node. The block
+	// is the first block-level element found when ascending from base node.
+	// The container is the first block-level element found when ascending
+	// from the block's parent.
+	//
+	// Example:
+	//
+	// a) Base node is a block-level element:
+	//
+	//    <div>                        <- Container
+	//      <p>Hello World</p>         <- Base & Block
+	//    </div>
+	//
+	// b) Base node is not a block-level element:
+	//
+	//    <div>                         <- Container
+	//      <p>                         <- Block
+	//        <span>
+	//          <i>Hello World</i>      <- Base
+	//        </span>
+	//      </p>
+	//    </div>
+	if block := getParentBlock(chunk.Base); block != nil {
+		chunk.Block = block
+	} else {
+		return nil, errors.New("no block found")
+	}
 
-	// Find the block level container of block.
+	// If there happens to be no block-level element after the block's parent,
+	// use block as container as well. This ensures that the container field
+	// is never nil and we avoid nil pointer handling in our code.
 	if container := getParentBlock(chunk.Block.Parent); container != nil {
 		chunk.Container = container
 	} else {
@@ -101,7 +131,7 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 
 	// Detect the classes of the current node. We use the good old class
 	// attribute and the new HTML5 microdata (itemprop attribute) to determine
-	// the content class.
+	// the content class. Most IDs aren't really meaningful, so no IDs here.
 	chunk.Classes = make([]string, 0)
 
 	// Ascend parent nodes until we found a class attribute and some
@@ -109,7 +139,6 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	haveClass := false
 	haveMicro := false
 	for prev := chunk.Base; prev != nil; prev = prev.Parent {
-		// TODO: Unlikely to happen, isn't it?
 		if prev.Type != html.ElementNode {
 			continue
 		}
@@ -122,7 +151,7 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 			default:
 				continue
 			}
-			// The default: continue case keeps us from getting here for values
+			// The default: continue case keeps us from reaching this for values
 			// we are not interested in.
 			for _, val := range strings.Fields(attr.Val) {
 				chunk.Classes = append(chunk.Classes, val)

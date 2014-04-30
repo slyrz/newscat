@@ -11,7 +11,7 @@ import (
 // It combines the content of one or more html.TextNodes. Whitespace is
 // ignored, but interword spaces are preserved. Therefore each Chunk
 // must contain actual text and whitespace-only html.TextNodes don't
-// result Chunks.
+// result in Chunks.
 type Chunk struct {
 	Prev      *Chunk     // previous chunk
 	Next      *Chunk     // next chunk

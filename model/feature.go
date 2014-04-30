@@ -3,48 +3,11 @@ package model
 import (
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/util"
-	// "fmt"
 )
 
 const (
 	numChunkFeatureComp = 36
 	numScoreFeatureComp = 10
-)
-
-var (
-	goodQualClass = util.NewRegexFromWords(
-		"article",
-		"catchline",
-		"content",
-		"head",
-		"intro",
-		"introduction",
-		"leadin",
-		"main",
-		"post",
-		"story",
-		"summary",
-	)
-	poorQualClass = util.NewRegexFromWords(
-		"author",
-		"blog",
-		"byline",
-		"caption",
-		"col",
-		"comment",
-		"description",
-		"email",
-		"excerpt",
-		"image",
-		"info",
-		"menu",
-		"metadata",
-		"nav",
-		"photo",
-		"small",
-		"teaser",
-		"widget",
-	)
 )
 
 // Feature represents a feature vector.
@@ -53,7 +16,7 @@ type Feature []float32
 type ChunkFeature [numChunkFeatureComp]float32
 type ScoreFeature [numScoreFeatureComp]float32
 
-// FeatureWriter writes values to a Feature array.
+// FeatureWriter writes observations to feature vectors.
 type FeatureWriter struct {
 	Feature Feature
 	Pos     int
@@ -225,6 +188,42 @@ func (fw *ChunkFeatureWriter) WriteClusterStat(chunk *html.Chunk, clusters map[*
 type ScoreFeatureWriter struct {
 	FeatureWriter
 }
+
+var (
+	goodQualClass = util.NewRegexFromWords(
+		"article",
+		"catchline",
+		"content",
+		"head",
+		"intro",
+		"introduction",
+		"leadin",
+		"main",
+		"post",
+		"story",
+		"summary",
+	)
+	poorQualClass = util.NewRegexFromWords(
+		"author",
+		"blog",
+		"byline",
+		"caption",
+		"col",
+		"comment",
+		"description",
+		"email",
+		"excerpt",
+		"image",
+		"info",
+		"menu",
+		"metadata",
+		"nav",
+		"photo",
+		"small",
+		"teaser",
+		"widget",
+	)
+)
 
 func (fw *ScoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
 	goodQual := false

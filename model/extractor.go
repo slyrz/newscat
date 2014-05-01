@@ -18,6 +18,22 @@ func NewExtractor() *Extractor {
 
 // Extract returns a list of relevant article content chunks found in
 // the document.
+//
+// How it works
+//
+// This function creates a feature vector for each chunk found in document.
+// A feature vector contains a numerical representation of the chunk's
+// properties like HTML element type, parent element type, number of words,
+// number of sentences and stuff like this.
+//
+// A logistic regression model is used to calculate scores based on these
+// feature vectors. Then, in some kind of meta / ensemble learning approach,
+// a second type of feature vector is created based on these scores.
+// This feature vector is fed to our random forest and finally
+// the random forest's predictions are used to generate the result.
+//
+// By now you might have noticed that I'm exceptionally bad at naming and
+// describing things properly.
 func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	ext.ChunkFeatures = nil
 	ext.ScoreFeatures = nil

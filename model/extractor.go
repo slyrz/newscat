@@ -1,7 +1,6 @@
 package model
 
 import (
-	_ "fmt"
 	"github.com/slyrz/newscat/html"
 )
 

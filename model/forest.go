@@ -1,6 +1,6 @@
 package model
 
-func decisionTreeA(s ScoreFeature) float32 {
+func decisionTreeA(s scoreFeature) float32 {
 	if s[6] <= -0.5804 {
 		if s[5] <= -2.1302 {
 			if s[9] <= 0.5903 {
@@ -200,7 +200,7 @@ func decisionTreeA(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeB(s ScoreFeature) float32 {
+func decisionTreeB(s scoreFeature) float32 {
 	if s[8] <= -0.5096 {
 		if s[1] <= 26.5000 {
 			if s[9] <= 0.5778 {
@@ -392,7 +392,7 @@ func decisionTreeB(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeC(s ScoreFeature) float32 {
+func decisionTreeC(s scoreFeature) float32 {
 	if s[7] <= -0.3658 {
 		if s[6] <= -0.6680 {
 			if s[6] <= -3.0571 {
@@ -620,7 +620,7 @@ func decisionTreeC(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeD(s ScoreFeature) float32 {
+func decisionTreeD(s scoreFeature) float32 {
 	if s[8] <= -0.1029 {
 		if s[6] <= 0.8930 {
 			if s[8] <= -0.5431 {
@@ -832,7 +832,7 @@ func decisionTreeD(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeE(s ScoreFeature) float32 {
+func decisionTreeE(s scoreFeature) float32 {
 	if s[5] <= -0.2691 {
 		if s[6] <= 1.0025 {
 			if s[9] <= 0.4722 {
@@ -1012,7 +1012,7 @@ func decisionTreeE(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeF(s ScoreFeature) float32 {
+func decisionTreeF(s scoreFeature) float32 {
 	if s[8] <= -0.5418 {
 		if s[1] <= 23.5000 {
 			if s[7] <= 1.0820 {
@@ -1172,7 +1172,7 @@ func decisionTreeF(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeG(s ScoreFeature) float32 {
+func decisionTreeG(s scoreFeature) float32 {
 	if s[5] <= -0.4279 {
 		if s[5] <= -3.4517 {
 			if s[5] <= -5.5368 {
@@ -1388,7 +1388,7 @@ func decisionTreeG(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeH(s ScoreFeature) float32 {
+func decisionTreeH(s scoreFeature) float32 {
 	if s[5] <= -0.2691 {
 		if s[0] <= 0.1090 {
 			if s[1] <= 4.5000 {
@@ -1580,7 +1580,7 @@ func decisionTreeH(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeI(s ScoreFeature) float32 {
+func decisionTreeI(s scoreFeature) float32 {
 	if s[1] <= 15.5000 {
 		if s[8] <= 0.4563 {
 			if s[1] <= 6.5000 {
@@ -1776,7 +1776,7 @@ func decisionTreeI(s ScoreFeature) float32 {
 	}
 }
 
-func decisionTreeJ(s ScoreFeature) float32 {
+func decisionTreeJ(s scoreFeature) float32 {
 	if s[6] <= -0.6855 {
 		if s[5] <= -2.4245 {
 			if s[0] <= 0.0064 {

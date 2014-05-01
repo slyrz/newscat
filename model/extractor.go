@@ -7,8 +7,8 @@ import (
 // Extractor utilizes the trained model to extract relevant html.Chunks from
 // an html.Document.
 type Extractor struct {
-	ChunkFeatures []ChunkFeature
-	ScoreFeatures []ScoreFeature
+	ChunkFeatures []chunkFeature
+	ScoreFeatures []scoreFeature
 }
 
 // NewExtractor creates and initalizes a new Extractor.
@@ -28,15 +28,15 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	}
 
 	// We create one feature for each chunk.
-	chunkFeatures := make([]ChunkFeature, len(doc.Chunks))
-	scoreFeatures := make([]ScoreFeature, len(doc.Chunks))
+	chunkFeatures := make([]chunkFeature, len(doc.Chunks))
+	scoreFeatures := make([]scoreFeature, len(doc.Chunks))
 
 	// Count the number of words and sentences we encountered for each
 	// class. This helps us to detect elements that contain the article text.
 	classStats := doc.GetClassStats()
 	clusterStats := doc.GetClusterStats()
 
-	chunkFeatureWriter := new(ChunkFeatureWriter)
+	chunkFeatureWriter := new(chunkFeatureWriter)
 	for i, chunk := range doc.Chunks {
 		// Fill the i-th feature based on the current chunk.
 		chunkFeatureWriter.Assign(chunkFeatures[i][:])
@@ -53,8 +53,8 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	}
 
 	// Detect min and max for each feature component, i.e. column-wise.
-	empMin := ChunkFeature{}
-	empMax := ChunkFeature{}
+	empMin := chunkFeature{}
+	empMax := chunkFeature{}
 	for i := 0; i < len(chunkFeatures); i++ {
 		for j, comp := range chunkFeatures[i] {
 			switch {
@@ -80,12 +80,12 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 	// Now we cluster Chunks by Containers to calculate average score per
 	// container.
-	clusterContainer := NewClusterMap()
+	clusterContainer := newClusterMap()
 	for i, chunk := range doc.Chunks {
 		clusterContainer.Add(chunk.Container, chunk, chunkFeatures[i].Score())
 	}
 
-	scoreFeatureWriter := new(ScoreFeatureWriter)
+	scoreFeatureWriter := new(scoreFeatureWriter)
 	for i, chunk := range doc.Chunks {
 		scoreFeatureWriter.Assign(scoreFeatures[i][:])
 		scoreFeatureWriter.WriteChunk(chunk)
@@ -93,7 +93,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 	}
 
-	clusterBlock := NewClusterMap()
+	clusterBlock := newClusterMap()
 	for i, chunk := range doc.Chunks {
 		clusterBlock.Add(chunk.Block, chunk, scoreFeatures[i].Score(), float32(chunk.Text.Len()))
 	}

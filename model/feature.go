@@ -10,33 +10,33 @@ const (
 	numScoreFeatureComp = 10
 )
 
-// Feature represents a feature vector.
-type Feature []float32
+// feature represents a feature vector.
+type feature []float32
 
-type ChunkFeature [numChunkFeatureComp]float32
-type ScoreFeature [numScoreFeatureComp]float32
+type chunkFeature [numChunkFeatureComp]float32
+type scoreFeature [numScoreFeatureComp]float32
 
-// FeatureWriter writes observations to feature vectors.
-type FeatureWriter struct {
-	Feature Feature
+// featureWriter writes observations to feature vectors.
+type featureWriter struct {
+	feature feature
 	Pos     int
 }
 
-func (fw *FeatureWriter) Assign(f Feature) {
+func (fw *featureWriter) Assign(f feature) {
 	// If we haven't fully filled the current feature vector yet, but are about to
 	// replace it with a new one, start to panic. We don't want to produce partially
 	// initalized feature vectors here.
-	if fw.Feature != nil && fw.Pos != cap(fw.Feature) {
+	if fw.feature != nil && fw.Pos != cap(fw.feature) {
 		panic("partially filled feature")
 	}
-	fw.Feature = f
+	fw.feature = f
 	fw.Pos = 0
 }
 
 // Write a value of type int, float32 or bool at given offset and skip the
 // requested amount of components afterwards.
-func (fw *FeatureWriter) write(val interface{}, off int, skip int) {
-	comp := &fw.Feature[fw.Pos+off]
+func (fw *featureWriter) write(val interface{}, off int, skip int) {
+	comp := &fw.feature[fw.Pos+off]
 	switch val := val.(type) {
 	case int:
 		*comp = float32(val)
@@ -55,22 +55,22 @@ func (fw *FeatureWriter) write(val interface{}, off int, skip int) {
 }
 
 // Write value at current position and move to the next.
-func (fw *FeatureWriter) Write(val interface{}) {
+func (fw *featureWriter) Write(val interface{}) {
 	fw.write(val, 0, 1)
 }
 
 // Write value at offset, but don't move.
-func (fw *FeatureWriter) WriteAt(val interface{}, off int) {
+func (fw *featureWriter) WriteAt(val interface{}, off int) {
 	fw.write(val, off, 0)
 }
 
 // Skip components.
-func (fw *FeatureWriter) Skip(n int) {
+func (fw *featureWriter) Skip(n int) {
 	fw.Pos += n
 }
 
-type ChunkFeatureWriter struct {
-	FeatureWriter
+type chunkFeatureWriter struct {
+	featureWriter
 }
 
 // Entries with a "plus comment" indicate that the next N elements share
@@ -87,7 +87,7 @@ var elementTypes = map[string]int{
 	"h6":  3,
 }
 
-func (fw *ChunkFeatureWriter) WriteElementType(chunk *html.Chunk) {
+func (fw *chunkFeatureWriter) WriteElementType(chunk *html.Chunk) {
 	// One hot encoding of the element type.
 	fw.WriteAt(true, elementTypes[chunk.Base.Data])
 	fw.Skip(4)
@@ -100,7 +100,7 @@ var parentTypes = map[string]int{
 	"li":   3,
 }
 
-func (fw *ChunkFeatureWriter) WriteParentType(chunk *html.Chunk) {
+func (fw *chunkFeatureWriter) WriteParentType(chunk *html.Chunk) {
 	// One hot encoding of the chunk's parent's element type.
 	if chunk.Base.Parent != nil {
 		fw.WriteAt(true, parentTypes[chunk.Base.Parent.Data])
@@ -108,7 +108,7 @@ func (fw *ChunkFeatureWriter) WriteParentType(chunk *html.Chunk) {
 	fw.Skip(4)
 }
 
-func (fw *ChunkFeatureWriter) WriteSiblingTypes(chunk *html.Chunk) {
+func (fw *chunkFeatureWriter) WriteSiblingTypes(chunk *html.Chunk) {
 	count := 0
 	types := map[string]int{"a": 0, "p": 0, "img": 0}
 	for _, siblingType := range chunk.GetSiblingTypes() {
@@ -130,20 +130,20 @@ func (fw *ChunkFeatureWriter) WriteSiblingTypes(chunk *html.Chunk) {
 	}
 }
 
-func (fw *ChunkFeatureWriter) WriteAncestors(chunk *html.Chunk) {
+func (fw *chunkFeatureWriter) WriteAncestors(chunk *html.Chunk) {
 	fw.Write((chunk.Ancestors & html.AncestorArticle) != 0)
 	fw.Write((chunk.Ancestors & html.AncestorAside) != 0)
 	fw.Write((chunk.Ancestors & html.AncestorBlockquote) != 0)
 	fw.Write((chunk.Ancestors & html.AncestorList) != 0)
 }
 
-func (fw *ChunkFeatureWriter) WriteTextStat(chunk *html.Chunk) {
+func (fw *chunkFeatureWriter) WriteTextStat(chunk *html.Chunk) {
 	fw.Write(chunk.Text.Words)
 	fw.Write(chunk.Text.Sentences)
 	fw.Write(chunk.LinkText)
 }
 
-func (fw *ChunkFeatureWriter) WriteTextStatSiblings(chunk *html.Chunk) {
+func (fw *chunkFeatureWriter) WriteTextStatSiblings(chunk *html.Chunk) {
 	if chunk.Prev != nil {
 		fw.Write(chunk.Prev.Block == chunk.Block)
 		fw.Write(chunk.Prev.Text.Words)
@@ -160,7 +160,7 @@ func (fw *ChunkFeatureWriter) WriteTextStatSiblings(chunk *html.Chunk) {
 	}
 }
 
-func (fw *ChunkFeatureWriter) WriteClassStat(chunk *html.Chunk, classes map[string]*html.TextStat) {
+func (fw *chunkFeatureWriter) WriteClassStat(chunk *html.Chunk, classes map[string]*html.TextStat) {
 	var best *html.TextStat = nil
 	for _, class := range chunk.Classes {
 		if stat, ok := classes[class]; ok {
@@ -179,7 +179,7 @@ func (fw *ChunkFeatureWriter) WriteClassStat(chunk *html.Chunk, classes map[stri
 	}
 }
 
-func (fw *ChunkFeatureWriter) WriteClusterStat(chunk *html.Chunk, clusters map[*html.Chunk]*html.TextStat) {
+func (fw *chunkFeatureWriter) WriteClusterStat(chunk *html.Chunk, clusters map[*html.Chunk]*html.TextStat) {
 	if stat, ok := clusters[chunk]; ok {
 		fw.Write(stat.Words)
 		fw.Write(stat.Sentences)
@@ -191,8 +191,8 @@ func (fw *ChunkFeatureWriter) WriteClusterStat(chunk *html.Chunk, clusters map[*
 	}
 }
 
-type ScoreFeatureWriter struct {
-	FeatureWriter
+type scoreFeatureWriter struct {
+	featureWriter
 }
 
 var (
@@ -231,7 +231,7 @@ var (
 	)
 )
 
-func (fw *ScoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
+func (fw *scoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
 	goodQual := false
 	poorQual := false
 	for _, class := range chunk.Classes {
@@ -245,7 +245,7 @@ func (fw *ScoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
 	fw.Write(poorQual)
 }
 
-func (fw *ScoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *Cluster) {
+func (fw *scoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *cluster) {
 	i := 0
 	for ; i < len(cluster.Chunks); i++ {
 		if cluster.Chunks[i] == chunk {
@@ -266,7 +266,7 @@ func (fw *ScoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *Cluster) 
 	}
 }
 
-func (fw *ScoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *util.Text) {
+func (fw *scoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *util.Text) {
 	switch chunk.Base.Data {
 	case "h1", "h2", "h3":
 		fw.Write(chunk.Text.Similarity(title))

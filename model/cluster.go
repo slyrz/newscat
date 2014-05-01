@@ -5,11 +5,11 @@ import (
 	"github.com/slyrz/newscat/html"
 )
 
-// A ClusterMap groups Clusters by HTML nodes.
-type ClusterMap map[*gonet.Node]*Cluster
+// A clusterMap groups Clusters by HTML nodes.
+type clusterMap map[*gonet.Node]*cluster
 
-// A Cluster stores a group of html.Chunks and their scores.
-type Cluster struct {
+// A cluster stores a group of html.Chunks and their scores.
+type cluster struct {
 	Chunks  []*html.Chunk
 	Scores  []float32
 	Weights []float32
@@ -18,18 +18,18 @@ type Cluster struct {
 	changed bool    // denotes struct changes after average calculation
 }
 
-// NewCluster creates and initalizes a new Cluster.
-func NewCluster() *Cluster {
-	result := new(Cluster)
+// newCluster creates and initalizes a new cluster.
+func newCluster() *cluster {
+	result := new(cluster)
 	result.Chunks = make([]*html.Chunk, 0)
 	result.Scores = make([]float32, 0)
 	result.Weights = make([]float32, 0)
 	return result
 }
 
-// Add adds the html.Chunk chunk to the Cluster. The variadic float32 parameter
+// Add adds the html.Chunk chunk to the cluster. The variadic float32 parameter
 // args must either be (score,) or (score, weight).
-func (cl *Cluster) Add(chunk *html.Chunk, args ...float32) {
+func (cl *cluster) Add(chunk *html.Chunk, args ...float32) {
 	var score float32 = 0.0
 	var weight float32 = 0.0
 	switch len(args) {
@@ -46,8 +46,8 @@ func (cl *Cluster) Add(chunk *html.Chunk, args ...float32) {
 	cl.changed = true
 }
 
-// Score calculates the weighted average of all chunk scores in Cluster.
-func (cl *Cluster) Score() float32 {
+// Score calculates the weighted average of all chunk scores in cluster.
+func (cl *cluster) Score() float32 {
 	if cl.changed {
 		var s float32 = 0.0
 		var w float32 = 0.0
@@ -61,16 +61,16 @@ func (cl *Cluster) Score() float32 {
 	return cl.average
 }
 
-// NewClusterMap creates and initalizes a new ClusterMap.
-func NewClusterMap() ClusterMap {
-	return make(ClusterMap)
+// newClusterMap creates and initalizes a new clusterMap.
+func newClusterMap() clusterMap {
+	return make(clusterMap)
 }
 
-// Add adds the html.Chunk chunk to the Cluster indexed by key.
-func (cl ClusterMap) Add(key *gonet.Node, chunk *html.Chunk, args ...float32) {
+// Add adds the html.Chunk chunk to the cluster indexed by key.
+func (cl clusterMap) Add(key *gonet.Node, chunk *html.Chunk, args ...float32) {
 	cluster, ok := cl[key]
 	if !ok {
-		cluster = NewCluster()
+		cluster = newCluster()
 		cl[key] = cluster
 	}
 	cluster.Add(chunk, args...)

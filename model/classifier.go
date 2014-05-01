@@ -1,6 +1,6 @@
 package model
 
-func (ftr ChunkFeature) Score() float32 {
+func (ftr chunkFeature) Score() float32 {
 	score := logitIntercept
 	for i := range ftr {
 		score += (ftr[i] * logitCoefficients[i])
@@ -8,11 +8,11 @@ func (ftr ChunkFeature) Score() float32 {
 	return score
 }
 
-func (ftr ChunkFeature) Predict() bool {
+func (ftr chunkFeature) Predict() bool {
 	return ftr.Score() > 0.0
 }
 
-func (ftr ScoreFeature) Score() float32 {
+func (ftr scoreFeature) Score() float32 {
 	score := float32(0.0)
 	score += decisionTreeA(ftr)
 	score += decisionTreeB(ftr)
@@ -27,6 +27,6 @@ func (ftr ScoreFeature) Score() float32 {
 	return score / 10.0
 }
 
-func (ftr ScoreFeature) Predict() bool {
+func (ftr scoreFeature) Predict() bool {
 	return ftr.Score() > 0.5
 }

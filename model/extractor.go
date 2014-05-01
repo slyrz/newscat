@@ -16,6 +16,8 @@ func NewExtractor() *Extractor {
 	return new(Extractor)
 }
 
+// Extract returns a list of relevant article content chunks found in
+// the document.
 func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	ext.ChunkFeatures = nil
 	ext.ScoreFeatures = nil

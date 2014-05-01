@@ -5,7 +5,7 @@ import (
 	"github.com/slyrz/newscat/html"
 )
 
-// A clusterMap groups Clusters by HTML nodes.
+// A clusterMap groups clusters by HTML nodes.
 type clusterMap map[*gonet.Node]*cluster
 
 // A cluster stores a group of html.Chunks and their scores.

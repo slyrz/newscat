@@ -6,15 +6,15 @@ import (
 )
 
 const (
-	numChunkFeatureComp = 36
-	numBoostFeatureComp = 10
+	chunkFeatureCap = 36
+	boostFeatureCap = 10
 )
 
 // feature represents a feature vector.
 type feature []float32
 
-type chunkFeature [numChunkFeatureComp]float32
-type boostFeature [numBoostFeatureComp]float32
+type chunkFeature [chunkFeatureCap]float32
+type boostFeature [boostFeatureCap]float32
 
 // featureWriter writes observations to feature vectors.
 type featureWriter struct {

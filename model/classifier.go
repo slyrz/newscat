@@ -12,7 +12,7 @@ func (ftr chunkFeature) Predict() bool {
 	return ftr.Score() > 0.0
 }
 
-func (ftr scoreFeature) Score() float32 {
+func (ftr boostFeature) Score() float32 {
 	score := float32(0.0)
 	score += decisionTreeA(ftr)
 	score += decisionTreeB(ftr)
@@ -27,6 +27,6 @@ func (ftr scoreFeature) Score() float32 {
 	return score / 10.0
 }
 
-func (ftr scoreFeature) Predict() bool {
+func (ftr boostFeature) Predict() bool {
 	return ftr.Score() > 0.5
 }

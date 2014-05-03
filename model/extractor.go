@@ -8,7 +8,7 @@ import (
 // an html.Document.
 type Extractor struct {
 	ChunkFeatures []chunkFeature
-	ScoreFeatures []scoreFeature
+	BoostFeatures []boostFeature
 }
 
 // NewExtractor creates and initalizes a new Extractor.
@@ -36,7 +36,7 @@ func NewExtractor() *Extractor {
 // describing things properly.
 func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	ext.ChunkFeatures = nil
-	ext.ScoreFeatures = nil
+	ext.BoostFeatures = nil
 
 	// No chunks? No features.
 	if len(doc.Chunks) == 0 {
@@ -45,7 +45,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 	// We create one feature for each chunk.
 	chunkFeatures := make([]chunkFeature, len(doc.Chunks))
-	scoreFeatures := make([]scoreFeature, len(doc.Chunks))
+	boostFeatures := make([]boostFeature, len(doc.Chunks))
 
 	// Count the number of words and sentences we encountered for each
 	// class. This helps us to detect elements that contain the article text.
@@ -99,12 +99,12 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		clusterContainer.Add(chunk.Container, chunk, chunkFeatures[i].Score())
 	}
 
-	scoreFeatureWriter := new(scoreFeatureWriter)
+	boostFeatureWriter := new(boostFeatureWriter)
 	for i, chunk := range doc.Chunks {
-		scoreFeatureWriter.Assign(scoreFeatures[i][:])
-		scoreFeatureWriter.WriteChunk(chunk)
-		scoreFeatureWriter.WriteCluster(chunk, clusterContainer[chunk.Container])
-		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
+		boostFeatureWriter.Assign(boostFeatures[i][:])
+		boostFeatureWriter.WriteChunk(chunk)
+		boostFeatureWriter.WriteCluster(chunk, clusterContainer[chunk.Container])
+		boostFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 	}
 
 	// Cluster chunks by block and add those blocks to the result whose average
@@ -112,7 +112,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	// blocks.
 	clusterBlock := newClusterMap()
 	for i, chunk := range doc.Chunks {
-		clusterBlock.Add(chunk.Block, chunk, scoreFeatures[i].Score(), float32(chunk.Text.Len()))
+		clusterBlock.Add(chunk.Block, chunk, boostFeatures[i].Score(), float32(chunk.Text.Len()))
 	}
 
 	// Keep blocks together.
@@ -125,6 +125,6 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 	// Make them accessible.
 	ext.ChunkFeatures = chunkFeatures
-	ext.ScoreFeatures = scoreFeatures
+	ext.BoostFeatures = boostFeatures
 	return result
 }

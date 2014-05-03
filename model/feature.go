@@ -7,14 +7,14 @@ import (
 
 const (
 	numChunkFeatureComp = 36
-	numScoreFeatureComp = 10
+	numBoostFeatureComp = 10
 )
 
 // feature represents a feature vector.
 type feature []float32
 
 type chunkFeature [numChunkFeatureComp]float32
-type scoreFeature [numScoreFeatureComp]float32
+type boostFeature [numBoostFeatureComp]float32
 
 // featureWriter writes observations to feature vectors.
 type featureWriter struct {
@@ -191,7 +191,7 @@ func (fw *chunkFeatureWriter) WriteClusterStat(chunk *html.Chunk, clusters map[*
 	}
 }
 
-type scoreFeatureWriter struct {
+type boostFeatureWriter struct {
 	featureWriter
 }
 
@@ -231,7 +231,7 @@ var (
 	)
 )
 
-func (fw *scoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
+func (fw *boostFeatureWriter) WriteChunk(chunk *html.Chunk) {
 	goodQual := false
 	poorQual := false
 	for _, class := range chunk.Classes {
@@ -245,7 +245,7 @@ func (fw *scoreFeatureWriter) WriteChunk(chunk *html.Chunk) {
 	fw.Write(poorQual)
 }
 
-func (fw *scoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *cluster) {
+func (fw *boostFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *cluster) {
 	i := 0
 	for ; i < len(cluster.Chunks); i++ {
 		if cluster.Chunks[i] == chunk {
@@ -266,7 +266,7 @@ func (fw *scoreFeatureWriter) WriteCluster(chunk *html.Chunk, cluster *cluster) 
 	}
 }
 
-func (fw *scoreFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *util.Text) {
+func (fw *boostFeatureWriter) WriteTitleSimilarity(chunk *html.Chunk, title *util.Text) {
 	switch chunk.Base.Data {
 	case "h1", "h2", "h3":
 		fw.Write(chunk.Text.Similarity(title))

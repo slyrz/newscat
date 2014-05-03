@@ -54,10 +54,7 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 
 	chunkFeatureWriter := new(chunkFeatureWriter)
 	for i, chunk := range doc.Chunks {
-		// Fill the i-th feature based on the current chunk.
 		chunkFeatureWriter.Assign(chunkFeatures[i][:])
-
-		// Write the observations to the feature vector.
 		chunkFeatureWriter.WriteElementType(chunk)
 		chunkFeatureWriter.WriteParentType(chunk)
 		chunkFeatureWriter.WriteSiblingTypes(chunk)
@@ -68,28 +65,29 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		chunkFeatureWriter.WriteClusterStat(chunk, clusterStats)
 	}
 
-	// Detect min and max for each feature component, i.e. column-wise.
+	// Detect the minimum and maximum value for each element in the
+	// feature vector.
 	empMin := chunkFeature{}
 	empMax := chunkFeature{}
-	for i := 0; i < len(chunkFeatures); i++ {
-		for j, comp := range chunkFeatures[i] {
+	for i := range chunkFeatures {
+		for j, val := range chunkFeatures[i] {
 			switch {
-			case comp < empMin[j]:
-				empMin[j] = comp
-			case comp > empMax[j]:
-				empMax[j] = comp
+			case val < empMin[j]:
+				empMin[j] = val
+			case val > empMax[j]:
+				empMax[j] = val
 			}
 		}
 	}
 
-	// Perform MinMax normalization for each feature component.
-	for i := 0; i < len(chunkFeatures); i++ {
+	// Perform MinMax normalization.
+	for i := range chunkFeatures {
 		feature := &chunkFeatures[i]
-		for j := 0; j < len(feature); j++ {
-			// If the maximum value isn't greater than one, we assume that
-			// the feature is already normalized.
+		for j, val := range chunkFeatures[i] {
+			// If the maximum value is not greater than one, we assume that the feature is
+			// already normalized and leave it untouched.
 			if empMax[j] > 1.0 {
-				feature[j] = (feature[j] - empMin[j]) / (empMax[j] - empMin[j])
+				feature[j] = (val - empMin[j]) / (empMax[j] - empMin[j])
 			}
 		}
 	}
@@ -109,6 +107,9 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		scoreFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 	}
 
+	// Cluster chunks by block and add those blocks to the result whose average
+	// score is above prediction level. This makes sure that we don't split large
+	// blocks.
 	clusterBlock := newClusterMap()
 	for i, chunk := range doc.Chunks {
 		clusterBlock.Add(chunk.Block, chunk, scoreFeatures[i].Score(), float32(chunk.Text.Len()))

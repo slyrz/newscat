@@ -4,7 +4,7 @@ This file shows the extraction quality for pages from various websites.
 You should take these results with a grain of salt. They are more or less used
 for regression testing only.
 
-The results were obtained using newscat built from `e7ba99c` commit.
+The results were obtained using newscat built from `b646f09` commit.
 
 |News                          |Website                       |          |Pages     |TP        |TN        |FP        |FN        |F-Score   |
 |:-----------------------------|:-----------------------------|:---------|---------:|---------:|---------:|---------:|---------:|---------:|
@@ -36,7 +36,7 @@ The results were obtained using newscat built from `e7ba99c` commit.
 |New York Times                |nytimes.com                   |US        |2         |47        |33        |0         |0         |1.00      |
 |Newsday                       |newsday.com                   |US        |2         |23        |258       |0         |0         |1.00      |
 |Orange County Register        |ocregister.com                |US        |2         |36        |118       |2         |1         |0.96      |
-|Philadelphia Inquirer         |inquirer.com                  |US        |3         |90        |402       |2         |1         |0.98      |
+|Philadelphia Inquirer         |inquirer.com                  |US        |3         |90        |402       |2         |0         |0.99      |
 |Politico                      |politico.com                  |US        |2         |55        |391       |0         |1         |0.99      |
 |Reuters                       |reuters.com                   |US        |2         |51        |298       |2         |0         |0.98      |
 |SFGate                        |sfgate.com                    |US        |2         |96        |25        |0         |0         |1.00      |
@@ -50,7 +50,7 @@ The results were obtained using newscat built from `e7ba99c` commit.
 |TechCrunch                    |techcrunch.com                |US        |2         |74        |121       |0         |0         |1.00      |
 |The Arizona Republic          |azcentral.com                 |US        |2         |43        |58        |0         |0         |1.00      |
 |The Atlantic                  |theatlantic.com               |US        |2         |131       |566       |0         |2         |0.99      |
-|The Dallas Morning News       |dallasnews.com                |US        |2         |54        |90        |1         |1         |0.98      |
+|The Dallas Morning News       |dallasnews.com                |US        |2         |54        |90        |1         |0         |0.99      |
 |The Hill                      |thehill.com                   |US        |2         |41        |380       |0         |0         |1.00      |
 |The New Yorker                |newyorker.com                 |US        |2         |48        |174       |1         |1         |0.98      |
 |The Plain Dealer              |cleveland.com                 |US        |2         |26        |414       |1         |0         |0.98      |
@@ -81,6 +81,7 @@ The results were obtained using newscat built from `e7ba99c` commit.
 |CICERO                        |cicero.de                     |DE        |2         |44        |180       |1         |2         |0.97      |
 |Der Freitag                   |freitag.de                    |DE        |2         |26        |109       |0         |1         |0.98      |
 |Der Tagesspiegel              |tagesspiegel.de               |DE        |2         |33        |215       |2         |0         |0.97      |
+|Deutsche Welle                |dw.de                         |DE        |2         |56        |547       |0         |2         |0.98      |
 |Die Zeit                      |zeit.de                       |DE        |2         |45        |309       |2         |1         |0.97      |
 |Focus                         |focus.de                      |DE        |3         |41        |331       |2         |5         |0.92      |
 |Frankfurter Allgemeine        |faz.net                       |DE        |2         |16        |476       |0         |0         |1.00      |
@@ -95,5 +96,14 @@ The results were obtained using newscat built from `e7ba99c` commit.
 |The European                  |theeuropean.de                |DE        |2         |125       |225       |0         |6         |0.98      |
 |Der Standard                  |derstandard.at                |AT        |2         |29        |411       |0         |1         |0.98      |
 |Neue Zürcher Zeitung          |nzz.ch                        |CH        |2         |30        |128       |1         |3         |0.94      |
-|                              |                              |          |*185*     |*4636*    |*26032*   |*74*      |*115*     |**0.98**  |
+|Le Figaro                     |lefigaro.fr                   |FR        |2         |42        |63        |0         |0         |1.00      |
+|Le Monde                      |lemonde.fr                    |FR        |2         |100       |160       |0         |0         |1.00      |
+|Libération                    |liberation.fr                 |FR        |2         |47        |168       |0         |0         |1.00      |
+|euronews                      |euronews.com                  |FR        |2         |21        |157       |0         |2         |0.95      |
+|Corriere della Sera           |corriere.it                   |IT        |4         |66        |395       |0         |11        |0.92      |
+|Il Sole 24 Ore                |ilsole24ore.com               |IT        |2         |23        |450       |0         |1         |0.98      |
+|La Repubblica                 |repubblica.it                 |IT        |2         |63        |162       |0         |0         |1.00      |
+|El Mundo                      |elmundo.es                    |ES        |2         |90        |121       |0         |0         |1.00      |
+|El País                       |elpais.com                    |ES        |2         |33        |1353      |0         |2         |0.97      |
+|                              |                              |          |*207*     |*5177*    |*29608*   |*74*      |*131*     |**0.98**  |
 

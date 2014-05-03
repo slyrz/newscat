@@ -199,6 +199,7 @@ var (
 	goodQualClass = util.NewRegexFromWords(
 		"article",
 		"catchline",
+		"chapter",
 		"content",
 		"head",
 		"intro",
@@ -208,6 +209,7 @@ var (
 		"post",
 		"story",
 		"summary",
+		"title",
 	)
 	poorQualClass = util.NewRegexFromWords(
 		"author",

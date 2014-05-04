@@ -28,7 +28,7 @@ func printChunks(chunks []*html.Chunk) {
 		// Print headings and emphasized text bold.
 		switch chunk.Base.Data {
 		case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
-			pre, pos = "\x1b[39;1m", "\x1b[0m"
+			pre, pos = "\x1b[1m", "\x1b[0m"
 		default:
 			pre, pos = "", ""
 		}

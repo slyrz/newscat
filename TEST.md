@@ -4,7 +4,7 @@ This file shows the extraction quality for pages from various websites.
 You should take these results with a grain of salt. They are more or less used
 for regression testing only.
 
-The results were obtained using newscat built from `b646f09` commit.
+The results were obtained using newscat built from `c9fc2d8` commit.
 
 |News                          |Website                       |          |Pages     |TP        |TN        |FP        |FN        |F-Score   |
 |:-----------------------------|:-----------------------------|:---------|---------:|---------:|---------:|---------:|---------:|---------:|

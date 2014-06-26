@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/model"
+	"github.com/slyrz/newscat/util"
 	"io"
 	"net/http"
 	"os"
 	"strings"
+)
+
+var (
+	highlight = util.IsTerminal(os.Stdout)
 )
 
 func printChunks(chunks []*html.Chunk) {
@@ -25,12 +30,14 @@ func printChunks(chunks []*html.Chunk) {
 				delim = " "
 			}
 		}
-		// Print headings and emphasized text bold.
-		switch chunk.Base.Data {
-		case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
-			pre, pos = "\x1b[1m", "\x1b[0m"
-		default:
-			pre, pos = "", ""
+		if highlight {
+			// Print headings and emphasized text bold.
+			switch chunk.Base.Data {
+			case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
+				pre, pos = "\x1b[1m", "\x1b[0m"
+			default:
+				pre, pos = "", ""
+			}
 		}
 		fmt.Printf("%s%s%s%s", delim, pre, chunk.Text, pos)
 		last = chunk

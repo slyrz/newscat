@@ -52,7 +52,7 @@ func main() {
 	go func() {
 		if args := os.Args[1:]; len(args) > 0 {
 			for _, arg := range args {
-				if strings.HasPrefix(arg, "http://") {
+				if strings.HasPrefix(arg, "http://") || strings.HasPrefix(arg, "https://") {
 					if resp, err := http.Get(arg); err == nil {
 						inputData <- resp.Body
 					}

@@ -15,6 +15,12 @@ var (
 	highlight = util.IsTerminal(os.Stdout)
 )
 
+// TODO
+type Input struct {
+	Name string
+	Data io.Reader
+}
+
 func printChunks(chunks []*html.Chunk) {
 	var last *html.Chunk = nil
 	for _, chunk := range chunks {
@@ -46,33 +52,33 @@ func printChunks(chunks []*html.Chunk) {
 }
 
 func main() {
-	inputData := make(chan io.Reader, 4)
+	inputChannel := make(chan Input, 4)
 	// Open all input (file paths or URLs) or read from stdin and write the
-	// corresponding io.Readers to the inputData channel.
+	// corresponding io.Readers to the inputChannel channel.
 	go func() {
 		if args := os.Args[1:]; len(args) > 0 {
 			for _, arg := range args {
 				if strings.HasPrefix(arg, "http://") || strings.HasPrefix(arg, "https://") {
 					if resp, err := http.Get(arg); err == nil {
-						inputData <- resp.Body
+						inputChannel <- Input{arg, resp.Body}
 					}
 				} else {
 					if file, err := os.Open(arg); err == nil {
-						inputData <- file
+						inputChannel <- Input{arg, file}
 					}
 				}
 			}
 		} else {
-			inputData <- os.Stdin
+			inputChannel <- Input{"", os.Stdin}
 		}
-		close(inputData)
+		close(inputChannel)
 	}()
 
 	ext := model.NewChunkExtractor()
-	// Read input from inputData channel and perform content extraction.
-	for data := range inputData {
+	// Read input from inputChannel channel and perform content extraction.
+	for input := range inputChannel {
 		// TODO: Warn if parsing document failed.
-		if doc, err := html.NewArticle(data); err == nil {
+		if doc, err := html.NewArticle(input.Data); err == nil {
 			// TODO: Print warning if no chunks were extracted.
 			if chunks := ext.Extract(doc); len(chunks) > 0 {
 				printChunks(chunks)

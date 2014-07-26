@@ -145,14 +145,12 @@ func (ext *LinkExtractor) Extract(website *html.Website) []*html.Link {
 		return nil
 	}
 
+	// Calculate the host name frequency. We assume that the more often
+	// we encounter a host name, the more important are its links.
 	hostFreq := make(map[string]float64)
+	unitFrac := 1.0 / float64(len(website.Links))
 	for _, link := range website.Links {
-		hostFreq[link.URL.Host] = hostFreq[link.URL.Host] + 1
-	}
-
-	total := float64(len(website.Links))
-	for host, count := range hostFreq {
-		hostFreq[host] = count / total
+		hostFreq[link.URL.Host] = hostFreq[link.URL.Host] + unitFrac
 	}
 
 	// TODO

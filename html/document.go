@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/slyrz/newscat/util"
 	"io"
+	"net/url"
 	"unicode"
 )
 
@@ -40,6 +41,12 @@ type Article struct {
 	// per html.ElementNode.
 	linkText map[*html.Node]int // length of text inside <a></a> tags
 	normText map[*html.Node]int // length of text outside <a></a> tags
+}
+
+// Website finds all links in a HTML document.
+type Website struct {
+	Document
+	Links []*Link // all links found in this document.
 }
 
 // NewDocument parses the HTML data provided through an io.Reader interface.
@@ -90,6 +97,46 @@ func (doc *Document) init(r io.Reader) error {
 		return IterNext
 	})
 	return nil
+}
+
+// NewWebsite parses the HTML data provided through an io.Reader interface
+// and returns, if successful, a Website object that can be used to access
+// all links and extract links to news articles.
+func NewWebsite(r io.Reader) (*Website, error) {
+	website := new(Website)
+	if err := website.init(r); err != nil {
+		return nil, err
+	}
+	return website, nil
+}
+
+func (website *Website) init(r io.Reader) error {
+	if err := website.Document.init(r); err != nil {
+		return err
+	}
+	website.Links = make([]*Link, 0, 256)
+	// Extract all links.
+	iterateNode(website.body, func(n *html.Node) int {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			if link, err := NewLink(n); err == nil {
+				website.Links = append(website.Links, link)
+			}
+			return IterSkip
+		}
+		return IterNext
+	})
+	return nil
+}
+
+// TODO
+func (website *Website) ResolveReference(ref string) error {
+	refURL, err := url.Parse(ref)
+	if err == nil {
+		for _, link := range website.Links {
+			link.Resolve(refURL)
+		}
+	}
+	return err
 }
 
 // NewArticle parses the HTML data provided through an io.Reader interface

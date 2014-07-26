@@ -52,7 +52,6 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	// TextNode children.
 	case html.ElementNode:
 		chunk.Base = n
-		chunk.addText(n)
 	// If a TextNode was passed, use the parent ElementNode for the
 	// base field.
 	case html.TextNode:
@@ -61,8 +60,8 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 			return nil, errors.New("orphaned TextNode")
 		}
 		chunk.Base = n.Parent
-		chunk.addText(n)
 	}
+	iterateText(n, chunk.Text.WriteString)
 
 	// We perform text extraction, not whitespace extraction.
 	if chunk.Text.Len() == 0 {
@@ -162,18 +161,6 @@ func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 		}
 	}
 	return chunk, nil
-}
-
-// Add all text from a html.Node to our chunk.
-func (ch *Chunk) addText(n *html.Node) {
-	switch n.Type {
-	case html.TextNode:
-		ch.Text.WriteString(n.Data)
-	case html.ElementNode:
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			ch.addText(c)
-		}
-	}
 }
 
 // Return the types of the base node's siblings.

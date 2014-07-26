@@ -48,24 +48,44 @@ func NewDocument(r io.Reader) (*Document, error) {
 }
 
 func (doc *Document) parse(r io.Reader) error {
+	doc.Title = util.NewText()
+
 	root, err := html.Parse(r)
 	if err != nil {
 		return err
 	}
-	// Assign the fields html, head and body from the HTML page.
-	doc.setNodes(root)
 
-	// Check if <html>, <head> and <body> nodes were found.
+	// Assign the fields html, head and body from the HTML page.
+	iterateNode(root, func(n *html.Node) int {
+		switch n.Data {
+		case "html":
+			doc.html = n
+			return IterNext
+		case "body":
+			doc.body = n
+			return IterSkip
+		case "head":
+			doc.head = n
+			return IterSkip
+		}
+		// Keep going as long as we're missing some nodes.
+		return IterNext
+	})
+
+	// Check if html, head and body nodes were found.
 	if doc.html == nil || doc.head == nil || doc.body == nil {
 		return errors.New("Document missing <html>, <head> or <body>.")
 	}
 
-	doc.parseHead(doc.head)
+	// Detect the document title.
+	iterateNode(doc.head, func(n *html.Node) int {
+		if n.Type == html.ElementNode && n.Data == "title" {
+			iterateText(n, doc.Title.WriteString)
+			return IterStop
+		}
+		return IterNext
+	})
 
-	// If no title was found, detecting the main heading might fail.
-	if doc.Title == nil {
-		doc.Title = util.NewText()
-	}
 	doc.linkText = make(map[*html.Node]int)
 	doc.normText = make(map[*html.Node]int)
 
@@ -84,35 +104,6 @@ func (doc *Document) parse(r io.Reader) error {
 		}
 	}
 	return nil
-}
-
-// Assign the struct fields html, head and body to their corresponding
-// HTML nodes.
-func (doc *Document) setNodes(n *html.Node) {
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		switch c.Data {
-		case "html":
-			doc.html = c
-			doc.setNodes(c)
-		case "body":
-			doc.body = c
-		case "head":
-			doc.head = c
-		}
-	}
-}
-
-// parseHead parses the <head>...</head> part of the HTML page. Right now it
-// is only used to detect the page title.
-func (doc *Document) parseHead(n *html.Node) {
-	if n.Type == html.ElementNode && n.Data == "title" {
-		if chunk, err := NewChunk(doc, n); err == nil {
-			doc.Title = chunk.Text
-		}
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		doc.parseHead(c)
-	}
 }
 
 // countText counts the text inside of links and the text outside of links

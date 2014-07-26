@@ -16,12 +16,11 @@ func NewExtractor() *Extractor {
 	return new(Extractor)
 }
 
-// Extract returns a list of relevant article content chunks found in
-// the articleument.
+// Extract returns a list of relevant text chunks found in article.
 //
 // How it works
 //
-// This function creates a feature vector for each chunk found in articleument.
+// This function creates a feature vector for each chunk found in article.
 // A feature vector contains a numerical representation of the chunk's
 // properties like HTML element type, parent element type, number of words,
 // number of sentences and stuff like this.

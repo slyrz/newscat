@@ -134,11 +134,11 @@ func (website *Website) init(r io.Reader) error {
 }
 
 // TODO
-func (website *Website) ResolveReference(ref string) error {
-	refURL, err := url.Parse(ref)
+func (website *Website) ResolveBase(base string) error {
+	baseURL, err := url.Parse(base)
 	if err == nil {
 		for _, link := range website.Links {
-			link.Resolve(refURL)
+			link.Resolve(baseURL)
 		}
 	}
 	return err

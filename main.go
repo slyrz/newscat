@@ -97,7 +97,7 @@ func main() {
 			if website, err := html.NewWebsite(input.Data); err == nil {
 				// Add protocol and domain to relative links before we perform
 				// link extraction. Works only if input.Location is a URL.
-				website.ResolveReference(input.Location)
+				website.ResolveBase(input.Location)
 				if links := ext.Extract(website); len(links) > 0 {
 					printLinks(links)
 				}

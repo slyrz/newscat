@@ -25,7 +25,6 @@ func NewLink(n *html.Node) (*Link, error) {
 	return nil, errors.New("href not found")
 }
 
-// TODO
-func (l *Link) Resolve(ref *url.URL) {
-	l.URL = ref.ResolveReference(l.URL)
+func (l *Link) Resolve(base *url.URL) {
+	l.URL = base.ResolveReference(l.URL)
 }

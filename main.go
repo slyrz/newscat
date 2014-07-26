@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/model"
@@ -11,15 +12,22 @@ import (
 	"strings"
 )
 
-var (
-	highlight = util.IsTerminal(os.Stdout)
-)
-
-// TODO
+// Input stores the user-provided HTML data and its location.
 type Input struct {
-	Name string
-	Data io.Reader
+	Location string    // either file path or URL or empty if data was read from stdin
+	Data     io.Reader // the HTML data (hopefully)
 }
+
+var (
+	// highlight indicates wether newscat should use ANSI escape codes
+	// to print headings and emphasized text in bold type. The default value of this flag
+	// depends on the type of stdout - it's set to false if newscat isn't printing
+	// onto a terminal.
+	highlight = flag.Bool("highlight", util.IsTerminal(os.Stdout), "highlight headings and emphasized text")
+
+	// extract defines the extraction method used.
+	extract = flag.String("extract", "content", "extract either article content or links")
+)
 
 func printChunks(chunks []*html.Chunk) {
 	var last *html.Chunk = nil
@@ -36,7 +44,7 @@ func printChunks(chunks []*html.Chunk) {
 				delim = " "
 			}
 		}
-		if highlight {
+		if *highlight {
 			// Print headings and emphasized text bold.
 			switch chunk.Base.Data {
 			case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
@@ -51,13 +59,21 @@ func printChunks(chunks []*html.Chunk) {
 	fmt.Println()
 }
 
+func printLinks(links []*html.Link) {
+	for _, link := range links {
+		fmt.Println(link.URL)
+	}
+}
+
 func main() {
+	flag.Parse()
+
 	inputChannel := make(chan Input, 4)
 	// Open all input (file paths or URLs) or read from stdin and write the
-	// corresponding io.Readers to the inputChannel channel.
+	// corresponding Input structs to the inputChannel channel.
 	go func() {
-		if args := os.Args[1:]; len(args) > 0 {
-			for _, arg := range args {
+		if flag.NArg() > 0 {
+			for _, arg := range flag.Args() {
 				if strings.HasPrefix(arg, "http://") || strings.HasPrefix(arg, "https://") {
 					if resp, err := http.Get(arg); err == nil {
 						inputChannel <- Input{arg, resp.Body}
@@ -74,14 +90,26 @@ func main() {
 		close(inputChannel)
 	}()
 
-	ext := model.NewChunkExtractor()
-	// Read input from inputChannel channel and perform content extraction.
-	for input := range inputChannel {
-		// TODO: Warn if parsing document failed.
-		if doc, err := html.NewArticle(input.Data); err == nil {
-			// TODO: Print warning if no chunks were extracted.
-			if chunks := ext.Extract(doc); len(chunks) > 0 {
-				printChunks(chunks)
+	switch *extract {
+	case "links":
+		ext := model.NewLinkExtractor()
+		for input := range inputChannel {
+			if website, err := html.NewWebsite(input.Data); err == nil {
+				// Add protocol and domain to relative links before we perform
+				// link extraction. Works only if input.Location is a URL.
+				website.ResolveReference(input.Location)
+				if links := ext.Extract(website); len(links) > 0 {
+					printLinks(links)
+				}
+			}
+		}
+	case "content":
+		ext := model.NewChunkExtractor()
+		for input := range inputChannel {
+			if article, err := html.NewArticle(input.Data); err == nil {
+				if chunks := ext.Extract(article); len(chunks) > 0 {
+					printChunks(chunks)
+				}
 			}
 		}
 	}

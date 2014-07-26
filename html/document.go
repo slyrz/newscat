@@ -133,7 +133,8 @@ func (website *Website) init(r io.Reader) error {
 	return nil
 }
 
-// TODO
+// ResolveBase transforms relative URLs to absolute URLs by adding
+// missing components from an absolute base URL.
 func (website *Website) ResolveBase(base string) error {
 	baseURL, err := url.Parse(base)
 	if err == nil {

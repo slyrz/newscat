@@ -139,6 +139,8 @@ func NewLinkExtractor() *LinkExtractor {
 	return new(LinkExtractor)
 }
 
+// Extract returns a list of links to possible news articles found on website.
+//
 // TODO
 func (ext *LinkExtractor) Extract(website *html.Website) []*html.Link {
 	if len(website.Links) == 0 {

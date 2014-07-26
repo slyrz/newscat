@@ -17,15 +17,21 @@ const (
 	AncestorList
 )
 
-// A Document is a parsed HTML document.
+// Document is a parsed HTML document that extracts the document title and
+// holds unexported pointers to the html, head and body nodes.
 type Document struct {
-	Title  *util.Text // the <title>...</title> text.
-	Chunks []*Chunk   // all chunks found in this document
+	Title *util.Text // the <title>...</title> text.
 
 	// Unexported fields.
 	html *html.Node // the <html>...</html> part
 	head *html.Node // the <head>...</head> part
 	body *html.Node // the <body>...</body> part
+}
+
+// Article stores all text chunks found in a HTML document.
+type Article struct {
+	Document
+	Chunks []*Chunk // all chunks found in this document.
 
 	// State variables used when collectiong chunks.
 	ancestors int // bitmask which stores ancestor of the current node
@@ -36,18 +42,16 @@ type Document struct {
 	normText map[*html.Node]int // length of text outside <a></a> tags
 }
 
-// NewDocument creates a new document by parsing the HTML page
-// provided by r.
+// NewDocument parses the HTML data provided through an io.Reader interface.
 func NewDocument(r io.Reader) (*Document, error) {
 	doc := new(Document)
-	doc.Chunks = make([]*Chunk, 0, 512)
-	if err := doc.parse(r); err != nil {
+	if err := doc.init(r); err != nil {
 		return nil, err
 	}
 	return doc, nil
 }
 
-func (doc *Document) parse(r io.Reader) error {
+func (doc *Document) init(r io.Reader) error {
 	doc.Title = util.NewText()
 
 	root, err := html.Parse(r)
@@ -85,22 +89,41 @@ func (doc *Document) parse(r io.Reader) error {
 		}
 		return IterNext
 	})
+	return nil
+}
 
-	doc.linkText = make(map[*html.Node]int)
-	doc.normText = make(map[*html.Node]int)
+// NewArticle parses the HTML data provided through an io.Reader interface
+// and returns, if successful, an Article object that can be used to access
+// all relevant text chunks found in the document.
+func NewArticle(r io.Reader) (*Article, error) {
+	article := new(Article)
+	if err := article.init(r); err != nil {
+		return nil, err
+	}
+	return article, nil
+}
 
-	doc.cleanBody(doc.body, 0)
-	doc.countText(doc.body, false)
-	doc.parseBody(doc.body)
+func (article *Article) init(r io.Reader) error {
+	if err := article.Document.init(r); err != nil {
+		return err
+	}
+
+	article.Chunks = make([]*Chunk, 0, 512)
+	article.linkText = make(map[*html.Node]int)
+	article.normText = make(map[*html.Node]int)
+
+	article.cleanBody(article.body, 0)
+	article.countText(article.body, false)
+	article.parseBody(article.body)
 
 	// Now we link the chunks.
-	min, max := 0, len(doc.Chunks)-1
-	for i := range doc.Chunks {
+	min, max := 0, len(article.Chunks)-1
+	for i := range article.Chunks {
 		if i > min {
-			doc.Chunks[i].Prev = doc.Chunks[i-1]
+			article.Chunks[i].Prev = article.Chunks[i-1]
 		}
 		if i < max {
-			doc.Chunks[i].Next = doc.Chunks[i+1]
+			article.Chunks[i].Next = article.Chunks[i+1]
 		}
 	}
 	return nil
@@ -109,14 +132,14 @@ func (doc *Document) parse(r io.Reader) error {
 // countText counts the text inside of links and the text outside of links
 // per html.Node. Counting is done cumulative, so the umbers of a parent node
 // include the numbers of it's child nodes.
-func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, normText int) {
+func (article *Article) countText(n *html.Node, insideLink bool) (linkText int, normText int) {
 	linkText = 0
 	normText = 0
 	if n.Type == html.ElementNode && n.Data == "a" {
 		insideLink = true
 	}
 	for s := n.FirstChild; s != nil; s = s.NextSibling {
-		linkTextChild, normTextChild := doc.countText(s, insideLink)
+		linkTextChild, normTextChild := article.countText(s, insideLink)
 		linkText += linkTextChild
 		normText += normTextChild
 	}
@@ -133,13 +156,13 @@ func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, nor
 			normText += count
 		}
 	}
-	doc.linkText[n] = linkText
-	doc.normText[n] = normText
+	article.linkText[n] = linkText
+	article.normText[n] = normText
 	return
 }
 
 // cleanBody removes unwanted HTML elements from the HTML body.
-func (doc *Document) cleanBody(n *html.Node, level int) {
+func (article *Article) cleanBody(n *html.Node, level int) {
 
 	// removeNode returns true if a node should be removed from HTML document.
 	removeNode := func(c *html.Node, level int) bool {
@@ -169,7 +192,7 @@ func (doc *Document) cleanBody(n *html.Node, level int) {
 			if removeNode(curr, level) {
 				n.RemoveChild(curr)
 			} else {
-				doc.cleanBody(curr, level+1)
+				article.cleanBody(curr, level+1)
 			}
 		}
 	}
@@ -201,7 +224,7 @@ var (
 
 // parseBody parses the <body>...</body> part of the HTML page. It creates
 // Chunks for every html.TextNode found in the body.
-func (doc *Document) parseBody(n *html.Node) {
+func (article *Article) parseBody(n *html.Node) {
 	switch n.Type {
 	case html.ElementNode:
 		// We ignore the node if it has some nasty classes/ids/itemprobs or if
@@ -225,8 +248,8 @@ func (doc *Document) parseBody(n *html.Node) {
 		// Descending into these children and handling every TextNode separately
 		// would make things unnecessary complicated and our results noisy.
 		case "h1", "h2", "h3", "h4", "h5", "h6", "a":
-			if chunk, err := NewChunk(doc, n); err == nil {
-				doc.Chunks = append(doc.Chunks, chunk)
+			if chunk, err := NewChunk(article, n); err == nil {
+				article.Chunks = append(article.Chunks, chunk)
 			}
 			return
 		// Now mask the element type, but only if it isn't already set.
@@ -234,24 +257,24 @@ func (doc *Document) parseBody(n *html.Node) {
 		// clear it at the end of this function, though it actually should be cleared
 		// by the caller.
 		case "article":
-			ancestorMask = AncestorArticle &^ doc.ancestors
+			ancestorMask = AncestorArticle &^ article.ancestors
 		case "aside":
-			ancestorMask = AncestorAside &^ doc.ancestors
+			ancestorMask = AncestorAside &^ article.ancestors
 		case "blockquote":
-			ancestorMask = AncestorBlockquote &^ doc.ancestors
+			ancestorMask = AncestorBlockquote &^ article.ancestors
 		case "ul", "ol":
-			ancestorMask = AncestorList &^ doc.ancestors
+			ancestorMask = AncestorList &^ article.ancestors
 		}
 		// Add our mask to the ancestor bitmask.
-		doc.ancestors |= ancestorMask
+		article.ancestors |= ancestorMask
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			doc.parseBody(c)
+			article.parseBody(c)
 		}
 		// Remove our mask from the ancestor bitmask.
-		doc.ancestors &^= ancestorMask
+		article.ancestors &^= ancestorMask
 	case html.TextNode:
-		if chunk, err := NewChunk(doc, n); err == nil {
-			doc.Chunks = append(doc.Chunks, chunk)
+		if chunk, err := NewChunk(article, n); err == nil {
+			article.Chunks = append(article.Chunks, chunk)
 		}
 	}
 }
@@ -265,9 +288,9 @@ type TextStat struct {
 
 // GetClassStats groups the document chunks by their classes (defined by the
 // class attribute of HTML nodes) and calculates TextStats for each class.
-func (doc *Document) GetClassStats() map[string]*TextStat {
+func (article *Article) GetClassStats() map[string]*TextStat {
 	result := make(map[string]*TextStat)
-	for _, chunk := range doc.Chunks {
+	for _, chunk := range article.Chunks {
 		for _, class := range chunk.Classes {
 			if stat, ok := result[class]; ok {
 				stat.Words += chunk.Text.Words
@@ -283,13 +306,13 @@ func (doc *Document) GetClassStats() map[string]*TextStat {
 
 // GetClusterStats groups the document chunks by common ancestors and
 // calculates TextStats for each group of chunks.
-func (doc *Document) GetClusterStats() map[*Chunk]*TextStat {
+func (article *Article) GetClusterStats() map[*Chunk]*TextStat {
 	// Don't ascend further than this.
 	const maxAncestors = 3
 
 	// Count TextStats for Chunk ancestors.
 	ancestorStat := make(map[*html.Node]*TextStat)
-	for _, chunk := range doc.Chunks {
+	for _, chunk := range article.Chunks {
 		node, count := chunk.Block, 0
 		for node != nil && count < maxAncestors {
 			if stat, ok := ancestorStat[node]; ok {
@@ -305,7 +328,7 @@ func (doc *Document) GetClusterStats() map[*Chunk]*TextStat {
 
 	// Generate result.
 	result := make(map[*Chunk]*TextStat)
-	for _, chunk := range doc.Chunks {
+	for _, chunk := range article.Chunks {
 		node := chunk.Block
 		if node == nil {
 			continue

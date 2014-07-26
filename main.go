@@ -72,7 +72,7 @@ func main() {
 	// Read input from inputData channel and perform content extraction.
 	for data := range inputData {
 		// TODO: Warn if parsing document failed.
-		if doc, err := html.NewDocument(data); err == nil {
+		if doc, err := html.NewArticle(data); err == nil {
 			// TODO: Print warning if no chunks were extracted.
 			if chunks := ext.Extract(doc); len(chunks) > 0 {
 				printChunks(chunks)

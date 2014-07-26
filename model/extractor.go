@@ -5,7 +5,7 @@ import (
 )
 
 // Extractor utilizes the trained model to extract relevant html.Chunks from
-// an html.Document.
+// an html.Article.
 type Extractor struct {
 	ChunkFeatures []chunkFeature
 	BoostFeatures []boostFeature
@@ -17,11 +17,11 @@ func NewExtractor() *Extractor {
 }
 
 // Extract returns a list of relevant article content chunks found in
-// the document.
+// the articleument.
 //
 // How it works
 //
-// This function creates a feature vector for each chunk found in document.
+// This function creates a feature vector for each chunk found in articleument.
 // A feature vector contains a numerical representation of the chunk's
 // properties like HTML element type, parent element type, number of words,
 // number of sentences and stuff like this.
@@ -34,26 +34,26 @@ func NewExtractor() *Extractor {
 //
 // By now you might have noticed that I'm exceptionally bad at naming and
 // describing things properly.
-func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
+func (ext *Extractor) Extract(article *html.Article) []*html.Chunk {
 	ext.ChunkFeatures = nil
 	ext.BoostFeatures = nil
 
 	// No chunks? No features.
-	if len(doc.Chunks) == 0 {
+	if len(article.Chunks) == 0 {
 		return nil
 	}
 
 	// We create one feature for each chunk.
-	chunkFeatures := make([]chunkFeature, len(doc.Chunks))
-	boostFeatures := make([]boostFeature, len(doc.Chunks))
+	chunkFeatures := make([]chunkFeature, len(article.Chunks))
+	boostFeatures := make([]boostFeature, len(article.Chunks))
 
 	// Count the number of words and sentences we encountered for each
 	// class. This helps us to detect elements that contain the article text.
-	classStats := doc.GetClassStats()
-	clusterStats := doc.GetClusterStats()
+	classStats := article.GetClassStats()
+	clusterStats := article.GetClusterStats()
 
 	chunkFeatureWriter := new(chunkFeatureWriter)
-	for i, chunk := range doc.Chunks {
+	for i, chunk := range article.Chunks {
 		chunkFeatureWriter.Assign(chunkFeatures[i][:])
 		chunkFeatureWriter.WriteElementType(chunk)
 		chunkFeatureWriter.WriteParentType(chunk)
@@ -95,29 +95,29 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	// Now we cluster Chunks by Containers to calculate average score per
 	// container.
 	clusterContainer := newClusterMap()
-	for i, chunk := range doc.Chunks {
+	for i, chunk := range article.Chunks {
 		clusterContainer.Add(chunk.Container, chunk, chunkFeatures[i].Score())
 	}
 
 	boostFeatureWriter := new(boostFeatureWriter)
-	for i, chunk := range doc.Chunks {
+	for i, chunk := range article.Chunks {
 		boostFeatureWriter.Assign(boostFeatures[i][:])
 		boostFeatureWriter.WriteChunk(chunk)
 		boostFeatureWriter.WriteCluster(chunk, clusterContainer[chunk.Container])
-		boostFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
+		boostFeatureWriter.WriteTitleSimilarity(chunk, article.Title)
 	}
 
 	// Cluster chunks by block and add those blocks to the result whose average
 	// score is above prediction level. This makes sure that we don't split large
 	// blocks.
 	clusterBlock := newClusterMap()
-	for i, chunk := range doc.Chunks {
+	for i, chunk := range article.Chunks {
 		clusterBlock.Add(chunk.Block, chunk, boostFeatures[i].Score(), float32(chunk.Text.Len()))
 	}
 
 	// Keep blocks together.
 	result := make([]*html.Chunk, 0, 8)
-	for _, chunk := range doc.Chunks {
+	for _, chunk := range article.Chunks {
 		if clusterBlock[chunk.Block].Score() > 0.5 {
 			result = append(result, chunk)
 		}

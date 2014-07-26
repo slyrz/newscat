@@ -10,6 +10,11 @@ import (
 )
 
 const (
+	chunkCap = 512 // initial capacity of the Article.Chunks array
+	linkCap  = 256 // initial capacity of the Website.Links array
+)
+
+const (
 	// We remember a few special node types when descending into their
 	// children.
 	AncestorArticle = 1 << iota
@@ -114,7 +119,7 @@ func (website *Website) init(r io.Reader) error {
 	if err := website.Document.init(r); err != nil {
 		return err
 	}
-	website.Links = make([]*Link, 0, 256)
+	website.Links = make([]*Link, 0, linkCap)
 	// Extract all links.
 	iterateNode(website.body, func(n *html.Node) int {
 		if n.Type == html.ElementNode && n.Data == "a" {
@@ -155,7 +160,7 @@ func (article *Article) init(r io.Reader) error {
 		return err
 	}
 
-	article.Chunks = make([]*Chunk, 0, 512)
+	article.Chunks = make([]*Chunk, 0, chunkCap)
 	article.linkText = make(map[*html.Node]int)
 	article.normText = make(map[*html.Node]int)
 

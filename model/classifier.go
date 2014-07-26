@@ -1,9 +1,9 @@
 package model
 
 func (ftr chunkFeature) Score() float32 {
-	score := logitIntercept
+	score := logit.Intercept
 	for i := range ftr {
-		score += (ftr[i] * logitCoefficients[i])
+		score += (ftr[i] * logit.Coefficients[i])
 	}
 	return score
 }

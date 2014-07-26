@@ -68,7 +68,7 @@ func main() {
 		close(inputData)
 	}()
 
-	ext := model.NewExtractor()
+	ext := model.NewChunkExtractor()
 	// Read input from inputData channel and perform content extraction.
 	for data := range inputData {
 		// TODO: Warn if parsing document failed.

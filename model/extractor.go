@@ -4,16 +4,16 @@ import (
 	"github.com/slyrz/newscat/html"
 )
 
-// Extractor utilizes the trained model to extract relevant html.Chunks from
+// ChunkExtractor utilizes the trained model to extract relevant html.Chunks from
 // an html.Article.
-type Extractor struct {
+type ChunkExtractor struct {
 	ChunkFeatures []chunkFeature
 	BoostFeatures []boostFeature
 }
 
-// NewExtractor creates and initalizes a new Extractor.
-func NewExtractor() *Extractor {
-	return new(Extractor)
+// NewChunkExtractor creates and initalizes a new ChunkExtractor.
+func NewChunkExtractor() *ChunkExtractor {
+	return new(ChunkExtractor)
 }
 
 // Extract returns a list of relevant text chunks found in article.
@@ -33,7 +33,7 @@ func NewExtractor() *Extractor {
 //
 // By now you might have noticed that I'm exceptionally bad at naming and
 // describing things properly.
-func (ext *Extractor) Extract(article *html.Article) []*html.Chunk {
+func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
 	ext.ChunkFeatures = nil
 	ext.BoostFeatures = nil
 

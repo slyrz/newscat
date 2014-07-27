@@ -30,6 +30,17 @@ var (
 	extractLinks   = flag.Bool("links", false, "extract links")
 )
 
+func init() {
+	flag.Usage = func() {
+		fmt.Println(`newscat [OPTION]... [PATH|URL]...
+
+Options:
+  -content    Extract article content (default).
+  -links      Extract links.
+  -highlight  Use ANSI escape codes to format output.`)
+	}
+}
+
 func printChunks(chunks []*html.Chunk) {
 	var last *html.Chunk = nil
 	for _, chunk := range chunks {

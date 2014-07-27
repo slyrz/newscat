@@ -40,7 +40,7 @@ type Article struct {
 	Chunks []*Chunk // all chunks found in this document.
 
 	// State variables used when collectiong chunks.
-	ancestors int // bitmask which stores ancestor of the current node
+	ancestors int // bitmask which stores ancestor types of the current node
 
 	// Number of non-space characters inside link tags / normal tags
 	// per html.ElementNode.

@@ -19,7 +19,7 @@ type Input struct {
 }
 
 var (
-	// highlight indicates wether newscat should use ANSI escape codes
+	// highlight indicates whether newscat should use ANSI escape codes
 	// to print headings and emphasized text in bold type. The default value of this flag
 	// depends on the type of stdout - it's set to false if newscat isn't printing
 	// onto a terminal.

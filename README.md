@@ -29,7 +29,7 @@ to build newscat. This should produce a `newscat` binary file in your
 
 newscat accepts file paths and HTTP URLs as command line arguments.
 
-    newscat [PATH]... [URL]...
+    newscat [OPTION]... [PATH|URL]...
 
 If no arguments are passed, newscat expects HTML written to its
 standard input.
@@ -40,6 +40,12 @@ It prints the extracted article text to standard output. If you want
 properly formatted paragraphs, pipe newscat's output to the `fmt` command.
 
     newscat ... | fmt
+
+Passing the `-links` command line flag makes newscat extract links
+instead of article content. This way you might obtain a very simple
+website crawler by running
+
+    newscat -links URL | sort | uniq | xargs newscat
 
 ### Training and Evaluation
 

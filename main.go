@@ -32,7 +32,7 @@ var (
 
 func init() {
 	flag.Usage = func() {
-		fmt.Println(`newscat [OPTION]... [PATH|URL]...
+		fmt.Fprintln(os.Stderr, `newscat [OPTION]... [PATH|URL]...
 
 Options:
   -content    Extract article content (default).

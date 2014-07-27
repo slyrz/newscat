@@ -25,8 +25,9 @@ var (
 	// onto a terminal.
 	highlight = flag.Bool("highlight", util.IsTerminal(os.Stdout), "highlight headings and emphasized text")
 
-	// extract defines the extraction method used.
-	extract = flag.String("extract", "content", "extract either article content or links")
+	// newscat extracts either article content or links.
+	extractContent = flag.Bool("content", true, "extract article content")
+	extractLinks   = flag.Bool("links", false, "extract links")
 )
 
 func printChunks(chunks []*html.Chunk) {
@@ -90,8 +91,8 @@ func main() {
 		close(inputChannel)
 	}()
 
-	switch *extract {
-	case "links":
+	switch {
+	case *extractLinks:
 		ext := model.NewLinkExtractor()
 		for input := range inputChannel {
 			if website, err := html.NewWebsite(input.Data); err == nil {
@@ -103,7 +104,7 @@ func main() {
 				}
 			}
 		}
-	case "content":
+	case *extractContent:
 		ext := model.NewChunkExtractor()
 		for input := range inputChannel {
 			if article, err := html.NewArticle(input.Data); err == nil {

@@ -237,7 +237,7 @@ func (article *Article) cleanBody(n *html.Node, level int) {
 	var curr *html.Node = n.FirstChild
 	var next *html.Node = nil
 	for ; curr != nil; curr = next {
-		// We have to remember the next sibling here becase calling RemoveChild
+		// We have to remember the next sibling here because calling RemoveChild
 		// sets curr's NextSibling pointer to nil and we would quit the loop
 		// prematurely.
 		next = curr.NextSibling
@@ -280,8 +280,8 @@ var (
 func (article *Article) parseBody(n *html.Node) {
 	switch n.Type {
 	case html.ElementNode:
-		// We ignore the node if it has some nasty classes/ids/itemprobs or if
-		// it contains "display: none" in its style attribute.
+		// We ignore the node if it has some nasty classes/ids/itemprops or if
+		// its style attribute contains "display: none".
 		for _, attr := range n.Attr {
 			switch attr.Key {
 			case "id", "class", "itemprop":

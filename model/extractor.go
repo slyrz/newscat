@@ -17,7 +17,7 @@ type ChunkExtractor struct {
 type LinkExtractor struct {
 }
 
-// NewChunkExtractor creates and initalizes a new ChunkExtractor.
+// NewChunkExtractor creates and initializes a new ChunkExtractor.
 func NewChunkExtractor() *ChunkExtractor {
 	return new(ChunkExtractor)
 }
@@ -134,7 +134,7 @@ func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
 	return result
 }
 
-// NewLinkExtractor creates and initalizes a new LinkExtractor.
+// NewLinkExtractor creates and initializes a new LinkExtractor.
 func NewLinkExtractor() *LinkExtractor {
 	return new(LinkExtractor)
 }

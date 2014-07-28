@@ -25,7 +25,7 @@ func NewLink(n *html.Node) (*Link, error) {
 	return nil, errors.New("href not found")
 }
 
-// Resolves joins link with an absoulte base URL if link isn't absolute yet.
+// Resolves joins link with an absolute base URL if link isn't absolute yet.
 func (l *Link) Resolve(base *url.URL) {
 	if l.URL.Scheme == "" || l.URL.Host == "" {
 		l.URL = base.ResolveReference(l.URL)

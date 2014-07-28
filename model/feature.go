@@ -23,9 +23,9 @@ type featureWriter struct {
 }
 
 func (fw *featureWriter) Assign(f feature) {
-	// If we haven't fully filled the current feature vector yet, but are about to
-	// replace it with a new one, start to panic. We don't want to produce partially
-	// initalized feature vectors here.
+	// Panic if we haven't fully filled the current feature vector yet, but are
+	// about to replace it with a new one. We don't want to produce initialized
+	// feature vectors here.
 	if fw.feature != nil && fw.Pos != cap(fw.feature) {
 		panic("partially filled feature")
 	}

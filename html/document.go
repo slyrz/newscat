@@ -128,11 +128,6 @@ func NewWebsite(r io.Reader) (*Website, error) {
 	return website, nil
 }
 
-const (
-	linkRelAlternate = 1 << iota
-	linkTypeRss
-)
-
 func (website *Website) init(r io.Reader) error {
 	if err := website.Document.init(r); err != nil {
 		return err
@@ -158,22 +153,21 @@ func (website *Website) init(r io.Reader) error {
 		}
 		// Scan the link attributes and make sure we find
 		//	rel="alternate" type="application/rss+xml" href="..."
-		href, hasAttr := "", 0
+		href, hasRel, hasType := "", false, false
 		for _, attr := range n.Attr {
 			switch {
 			case attr.Key == "rel" && attr.Val == "alternate":
-				hasAttr |= linkRelAlternate
+				hasRel = true
 			case attr.Key == "type" && attr.Val == "application/rss+xml":
-				hasAttr |= linkTypeRss
+				hasType = true
 			case attr.Key == "href":
 				href = attr.Val
 			}
 		}
-		if hasAttr != (linkTypeRss|linkRelAlternate) || href == "" {
-			return IterNext
-		}
-		if link, err := NewLinkFromString(href); err == nil {
-			website.Feeds = append(website.Feeds, link)
+		if hasRel && hasType && href != "" {
+			if link, err := NewLinkFromString(href); err == nil {
+				website.Feeds = append(website.Feeds, link)
+			}
 		}
 		return IterNext
 	})

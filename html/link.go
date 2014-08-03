@@ -11,15 +11,20 @@ type Link struct {
 	URL *url.URL
 }
 
+// NewLinkFromString creates a new link by parsing a URL string.
+func NewLinkFromString(s string) (*Link, error) {
+	if url, err := url.Parse(s); err == nil {
+		return &Link{url}, nil
+	} else {
+		return nil, err
+	}
+}
+
 // NewLink creates a new link from a HTML anchor node.
 func NewLink(n *html.Node) (*Link, error) {
 	for _, attr := range n.Attr {
 		if attr.Key == "href" {
-			if url, err := url.Parse(attr.Val); err != nil {
-				return nil, err
-			} else {
-				return &Link{url}, nil
-			}
+			return NewLinkFromString(attr.Val)
 		}
 	}
 	return nil, errors.New("href not found")

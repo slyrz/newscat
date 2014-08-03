@@ -12,6 +12,7 @@ import (
 const (
 	chunkCap = 512 // initial capacity of the Article.Chunks array
 	linkCap  = 256 // initial capacity of the Website.Links array
+	feedCap  = 4   // initial capacity of the Website.Feeds array
 )
 
 const (
@@ -52,6 +53,7 @@ type Article struct {
 type Website struct {
 	Document
 	Links []*Link // all links found in this document.
+	Feeds []*Link // all RSS feeds found in this document.
 }
 
 // NewDocument parses the HTML data provided through an io.Reader interface.
@@ -115,11 +117,18 @@ func NewWebsite(r io.Reader) (*Website, error) {
 	return website, nil
 }
 
+const (
+	linkRelAlternate = 1 << iota
+	linkTypeRss
+)
+
 func (website *Website) init(r io.Reader) error {
 	if err := website.Document.init(r); err != nil {
 		return err
 	}
 	website.Links = make([]*Link, 0, linkCap)
+	website.Feeds = make([]*Link, 0, feedCap)
+
 	// Extract all links.
 	iterateNode(website.body, func(n *html.Node) int {
 		if n.Type == html.ElementNode && n.Data == "a" {
@@ -127,6 +136,33 @@ func (website *Website) init(r io.Reader) error {
 				website.Links = append(website.Links, link)
 			}
 			return IterSkip
+		}
+		return IterNext
+	})
+
+	// Extract all RSS feeds.
+	iterateNode(website.head, func(n *html.Node) int {
+		if n.Data != "link" {
+			return IterNext
+		}
+		// Scan the link attributes and make sure we find
+		//	rel="alternate" type="application/rss+xml" href="..."
+		href, hasAttr := "", 0
+		for _, attr := range n.Attr {
+			switch {
+			case attr.Key == "rel" && attr.Val == "alternate":
+				hasAttr |= linkRelAlternate
+			case attr.Key == "type" && attr.Val == "application/rss+xml":
+				hasAttr |= linkTypeRss
+			case attr.Key == "href":
+				href = attr.Val
+			}
+		}
+		if hasAttr != (linkTypeRss|linkRelAlternate) || href == "" {
+			return IterNext
+		}
+		if link, err := NewLinkFromString(href); err == nil {
+			website.Feeds = append(website.Feeds, link)
 		}
 		return IterNext
 	})
@@ -140,6 +176,9 @@ func (website *Website) ResolveBase(base string) error {
 	if err == nil {
 		for _, link := range website.Links {
 			link.Resolve(baseURL)
+		}
+		for _, feed := range website.Feeds {
+			feed.Resolve(baseURL)
 		}
 	}
 	return err

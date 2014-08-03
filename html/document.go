@@ -24,6 +24,13 @@ const (
 	AncestorList
 )
 
+// Errors returned during Document parsing.
+var (
+	ErrNoHTML = errors.New("missing html element")
+	ErrNoHead = errors.New("missing head element")
+	ErrNoBody = errors.New("missing body element")
+)
+
 // Document is a parsed HTML document that extracts the document title and
 // holds unexported pointers to the html, head and body nodes.
 type Document struct {
@@ -90,9 +97,13 @@ func (doc *Document) init(r io.Reader) error {
 		return IterNext
 	})
 
-	// Check if html, head and body nodes were found.
-	if doc.html == nil || doc.head == nil || doc.body == nil {
-		return errors.New("Document missing <html>, <head> or <body>.")
+	switch {
+	case doc.html == nil:
+		return ErrNoHTML
+	case doc.head == nil:
+		return ErrNoHead
+	case doc.body == nil:
+		return ErrNoBody
 	}
 
 	// Detect the document title.

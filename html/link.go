@@ -6,6 +6,11 @@ import (
 	"net/url"
 )
 
+// Errors returned by the NewLink functions.
+var (
+	ErrNoHref = errors.New("no href")
+)
+
 // Link holds a URL.
 type Link struct {
 	URL *url.URL
@@ -27,7 +32,7 @@ func NewLink(n *html.Node) (*Link, error) {
 			return NewLinkFromString(attr.Val)
 		}
 	}
-	return nil, errors.New("href not found")
+	return nil, ErrNoHref
 }
 
 // Resolves joins link with an absolute base URL if link isn't absolute yet.

@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+// Errors returned by the NewChunk function.
+var (
+	ErrNoParent = errors.New("no parent")
+	ErrNoText   = errors.New("no text")
+	ErrNoBlock  = errors.New("no block node after parent")
+)
+
 // A Chunk is a chunk of consecutive text found in the HTML document.
 // It combines the content of one or more html.TextNodes. Whitespace is
 // ignored, but interword spaces are preserved. Therefore each Chunk
@@ -55,9 +62,9 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	// If a TextNode was passed, use the parent ElementNode for the
 	// base field.
 	case html.TextNode:
-		// We don't allow baseless Chunks.
+		// We don't allow orphaned Chunks.
 		if n.Parent == nil {
-			return nil, errors.New("orphaned TextNode")
+			return nil, ErrNoParent
 		}
 		chunk.Base = n.Parent
 	}
@@ -65,7 +72,7 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 
 	// We perform text extraction, not whitespace extraction.
 	if chunk.Text.Len() == 0 {
-		return nil, errors.New("no text")
+		return nil, ErrNoText
 	}
 
 	// Now we detect the HTML block and container of the base node. The block
@@ -93,7 +100,7 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	if block := getParentBlock(chunk.Base); block != nil {
 		chunk.Block = block
 	} else {
-		return nil, errors.New("no block found")
+		return nil, ErrNoBlock
 	}
 
 	// If there happens to be no block-level element after the block's parent,

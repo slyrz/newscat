@@ -155,12 +155,12 @@ func (website *Website) init(r io.Reader) error {
 		//	rel="alternate" type="application/rss+xml" href="..."
 		href, hasRel, hasType := "", false, false
 		for _, attr := range n.Attr {
-			switch {
-			case attr.Key == "rel" && attr.Val == "alternate":
-				hasRel = true
-			case attr.Key == "type" && attr.Val == "application/rss+xml":
-				hasType = true
-			case attr.Key == "href":
+			switch attr.Key {
+			case "rel":
+				hasRel = attr.Val == "alternate"
+			case "type":
+				hasType = attr.Val == "application/rss+xml"
+			case "href":
 				href = attr.Val
 			}
 		}

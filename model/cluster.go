@@ -56,7 +56,7 @@ func (cl *cluster) Score() float32 {
 			w += cl.Weights[i]
 		}
 		cl.average = s / w
-		cl.changed = true
+		cl.changed = false
 	}
 	return cl.average
 }

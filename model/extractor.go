@@ -138,7 +138,19 @@ func NewLinkExtractor() *LinkExtractor {
 
 // Extract returns a list of links to possible news articles found on website.
 //
-// TODO
+// How it works
+//
+// This function calculates a score for each link found on website. The score
+// is the product of the host name frequency and the entropy of the
+// path component. If the score exceeds a fixed threshold, the link is assumed
+// to be relevant and included in the result.
+//
+// This is very simple and works surpsingly well since for most news sites,
+// the following assumptions hold:
+// 1. The majority of links lead to relevant content.
+// 2. The majority of relevant links share the same host name.
+// 3. The path of a relevant link tends to be longer than the path of a
+//    non-relevant link.
 func (ext *LinkExtractor) Extract(website *html.Website) []*html.Link {
 	if len(website.Links) == 0 {
 		return nil
@@ -152,7 +164,6 @@ func (ext *LinkExtractor) Extract(website *html.Website) []*html.Link {
 		hostFreq[link.URL.Host] = hostFreq[link.URL.Host] + unitFrac
 	}
 
-	// TODO
 	result := make([]*html.Link, 0, 8)
 	for _, link := range website.Links {
 		score := calcEntropy(link.URL.Path) * hostFreq[link.URL.Host]

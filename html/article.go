@@ -25,13 +25,10 @@ type Article struct {
 	Document
 	Chunks []*Chunk // all chunks found in this document.
 
-	// State variables used when collectiong chunks.
-	ancestors int // bitmask which stores ancestor types of the current node
-
-	// Number of non-space characters inside link tags / normal tags
-	// per html.ElementNode.
-	linkText map[*html.Node]int // length of text inside <a></a> tags
-	normText map[*html.Node]int // length of text outside <a></a> tags
+	// Unexported fields used as state variables during parsing.
+	ancestors int                // bitmask to track specific ancestor types
+	linkText  map[*html.Node]int // length of text inside <a></a> tags
+	normText  map[*html.Node]int // length of text outside <a></a> tags
 }
 
 // NewArticle parses the HTML data provided through an io.Reader interface
@@ -268,7 +265,7 @@ func (article *Article) GetClusterStats() map[*Chunk]*TextStat {
 		}
 	}
 
-	// Generate result.
+	// Generate result. For each chunk pick the best TextStats from its ancestors.
 	result := make(map[*Chunk]*TextStat)
 	for _, chunk := range article.Chunks {
 		node := chunk.Block

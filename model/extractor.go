@@ -42,13 +42,10 @@ func NewChunkExtractor() *ChunkExtractor {
 func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
 	ext.ChunkFeatures = nil
 	ext.BoostFeatures = nil
-
-	// No chunks? No features.
 	if len(article.Chunks) == 0 {
 		return nil
 	}
 
-	// We create one feature for each chunk.
 	chunkFeatures := make([]chunkFeature, len(article.Chunks))
 	boostFeatures := make([]boostFeature, len(article.Chunks))
 
@@ -97,7 +94,7 @@ func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
 		}
 	}
 
-	// Now we cluster Chunks by Containers to calculate average score per
+	// Now cluster chunks by containers to calculate average score per
 	// container.
 	clusterContainer := newClusterMap()
 	for i, chunk := range article.Chunks {

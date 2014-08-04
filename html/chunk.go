@@ -68,9 +68,11 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 		}
 		chunk.Base = n.Parent
 	}
+
+	// Write the text of all TextNodes of n to chunk.Text.
 	iterateText(n, chunk.Text.WriteString)
 
-	// We perform text extraction, not whitespace extraction.
+	// Don't produce Chunks without text.
 	if chunk.Text.Len() == 0 {
 		return nil, ErrNoText
 	}
@@ -157,8 +159,8 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 			default:
 				continue
 			}
-			// The default: continue case keeps us from reaching this for values
-			// we are not interested in.
+			// The default: continue case keeps us from reaching this for
+			// attributes we are not interested in.
 			for _, val := range strings.Fields(attr.Val) {
 				chunk.Classes = append(chunk.Classes, val)
 			}
@@ -170,7 +172,8 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	return chunk, nil
 }
 
-// Return the types of the base node's siblings.
+// Returns a list of strings containing the HTML element types
+// of the Chunk's siblings.
 func (ch *Chunk) GetSiblingTypes() []string {
 	result := make([]string, 0, 8)
 	for s := ch.Base.PrevSibling; s != nil; s = s.PrevSibling {
@@ -186,7 +189,8 @@ func (ch *Chunk) GetSiblingTypes() []string {
 	return result
 }
 
-// Return the types of the base node's children.
+// Returns a list of strings containing the HTML element types
+// of the Chunk's children.
 func (ch *Chunk) GetChildTypes() []string {
 	result := make([]string, 0, 8)
 	for s := ch.Base.FirstChild; s != nil; s = s.NextSibling {

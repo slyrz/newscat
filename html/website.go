@@ -11,7 +11,7 @@ const (
 	feedCap = 4   // initial capacity of the Website.Feeds array
 )
 
-// Website finds all links in a HTML document.
+// Website finds all links and RSS feeds in a HTML document.
 type Website struct {
 	Document
 	Links []*Link // all links found in this document.

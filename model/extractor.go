@@ -145,12 +145,13 @@ func NewLinkExtractor() *LinkExtractor {
 // path component. If the score exceeds a fixed threshold, the link is assumed
 // to be relevant and included in the result.
 //
-// This is very simple and works surpsingly well since for most news sites,
+// This is very simple and works surprisingly well since for most news sites,
 // the following assumptions hold:
-// 1. The majority of links lead to relevant content.
-// 2. The majority of relevant links share the same host name.
-// 3. The path of a relevant link tends to be longer than the path of a
-//    non-relevant link.
+//
+//   1. The majority of links lead to relevant content.
+//   2. The majority of relevant links share the same host name.
+//   3. The path of a relevant link tends to be longer than the path of a
+//      non-relevant link.
 func (ext *LinkExtractor) Extract(website *html.Website) []*html.Link {
 	if len(website.Links) == 0 {
 		return nil

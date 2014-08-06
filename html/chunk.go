@@ -16,7 +16,7 @@ var (
 
 // A Chunk is a chunk of consecutive text found in the HTML document.
 // It combines the content of one or more html.TextNodes. Whitespace is
-// ignored, but interword spaces are preserved. Therefore each Chunk
+// ignored, but inter-word separation is preserved. Therefore each Chunk
 // must contain actual text and whitespace-only html.TextNodes don't
 // result in Chunks.
 type Chunk struct {
@@ -35,7 +35,7 @@ func getParentBlock(n *html.Node) *html.Node {
 	// Keep ascending as long as the node points to an HTML inline element.
 	// We stop at the first block-level element. The list of inline elements
 	// was taken from:
-	// https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
+	//   https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
 	for ; n != nil && n.Parent != nil; n = n.Parent {
 		switch n.Data {
 		case "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite",
@@ -82,23 +82,23 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	// The container is the first block-level element found when ascending
 	// from the block's parent.
 	//
-	// Example:
+	// Example
 	//
-	// a) Base node is a block-level element:
+	// Base node is a block-level element:
 	//
-	//    <div>                        <- Container
-	//      <p>Hello World</p>         <- Base & Block
-	//    </div>
+	//   <div>                        <- Container
+	//     <p>Hello World</p>         <- Base & Block
+	//   </div>
 	//
-	// b) Base node is not a block-level element:
+	// Base node is not a block-level element:
 	//
-	//    <div>                         <- Container
-	//      <p>                         <- Block
-	//        <span>
-	//          <i>Hello World</i>      <- Base
-	//        </span>
-	//      </p>
-	//    </div>
+	//   <div>                         <- Container
+	//     <p>                         <- Block
+	//       <span>
+	//         <i>Hello World</i>      <- Base
+	//       </span>
+	//     </p>
+	//   </div>
 	if block := getParentBlock(chunk.Base); block != nil {
 		chunk.Block = block
 	} else {
@@ -122,12 +122,12 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	// quality of a link. Links used as cross references inside the article
 	// content have a small link text to text ratio,
 	//
-	//	<p>Long text .... <a>short text</a> ... </p>
+	//   <p>Long text .... <a>short text</a> ... </p>
 	//
 	// whereas related content / navigation links have a high link text
 	// to text ratio:
 	//
-	// 	<li><a>See also: ...</a></li>
+	//   <li><a>See also: ...</a></li>
 	//
 	linkText := article.linkText[chunk.Block]
 	normText := article.normText[chunk.Block]

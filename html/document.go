@@ -116,8 +116,8 @@ const (
 )
 
 // countText counts the text inside of links and the text outside of links
-// per html.Node. Counting is done cumulative, so the umbers of a parent node
-// include the numbers of it's child nodes.
+// per html.Node. Counting is done cumulative, so the numbers of a parent node
+// include the numbers of its child nodes.
 func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, normText int) {
 	linkText = 0
 	normText = 0

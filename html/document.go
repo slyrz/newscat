@@ -212,7 +212,7 @@ var (
 		"credit",
 		"description",
 		"email",
-		"foot",
+		"footer",
 		"gallery",
 		"hide",
 		"infotext",

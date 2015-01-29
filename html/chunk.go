@@ -50,7 +50,7 @@ func getParentBlock(n *html.Node) *html.Node {
 	return n
 }
 
-func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
+func NewChunk(doc *Document, n *html.Node) (*Chunk, error) {
 	chunk := new(Chunk)
 	chunk.Text = util.NewText()
 
@@ -115,11 +115,11 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	}
 
 	// Remember the ancestors in our chunk.
-	chunk.Ancestors = article.ancestors
+	chunk.Ancestors = doc.ancestors
 
 	// Calculate the ratio between text inside links and text outside links
 	// for the current element's block node. This is useful to determine the
-	// quality of a link. Links used as cross references inside the article
+	// quality of a link. Links used as cross references inside the doc
 	// content have a small link text to text ratio,
 	//
 	//   <p>Long text .... <a>short text</a> ... </p>
@@ -129,8 +129,8 @@ func NewChunk(article *Article, n *html.Node) (*Chunk, error) {
 	//
 	//   <li><a>See also: ...</a></li>
 	//
-	linkText := article.linkText[chunk.Block]
-	normText := article.normText[chunk.Block]
+	linkText := doc.linkText[chunk.Block]
+	normText := doc.normText[chunk.Block]
 	if normText == 0 && linkText == 0 {
 		chunk.LinkText = 0.0
 	} else {

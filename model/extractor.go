@@ -2,31 +2,25 @@ package model
 
 import (
 	"github.com/slyrz/newscat/html"
-	"math"
-	"strings"
 )
 
-// ChunkExtractor utilizes the trained model to extract relevant html.Chunks from
-// an html.Article.
-type ChunkExtractor struct {
+// Extractor utilizes the trained model to extract relevant html.Chunks from
+// an html.Document.
+type Extractor struct {
 	ChunkFeatures []chunkFeature
 	BoostFeatures []boostFeature
 }
 
-// LinkExtractor extracts possible links to news articles from a html.Website.
-type LinkExtractor struct {
+// NewExtractor creates and initializes a new Extractor.
+func NewExtractor() *Extractor {
+	return new(Extractor)
 }
 
-// NewChunkExtractor creates and initializes a new ChunkExtractor.
-func NewChunkExtractor() *ChunkExtractor {
-	return new(ChunkExtractor)
-}
-
-// Extract returns a list of relevant text chunks found in article.
+// Extract returns a list of relevant text chunks found in doc.
 //
 // How it works
 //
-// This function creates a feature vector for each chunk found in article.
+// This function creates a feature vector for each chunk found in doc.
 // A feature vector contains a numerical representation of the chunk's
 // properties like HTML element type, parent element type, number of words,
 // number of sentences and stuff like this.
@@ -39,23 +33,23 @@ func NewChunkExtractor() *ChunkExtractor {
 //
 // By now you might have noticed that I'm exceptionally bad at naming and
 // describing things properly.
-func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
+func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 	ext.ChunkFeatures = nil
 	ext.BoostFeatures = nil
-	if len(article.Chunks) == 0 {
+	if len(doc.Chunks) == 0 {
 		return nil
 	}
 
-	chunkFeatures := make([]chunkFeature, len(article.Chunks))
-	boostFeatures := make([]boostFeature, len(article.Chunks))
+	chunkFeatures := make([]chunkFeature, len(doc.Chunks))
+	boostFeatures := make([]boostFeature, len(doc.Chunks))
 
 	// Count the number of words and sentences we encountered for each
-	// class. This helps us to detect elements that contain the article text.
-	classStats := article.GetClassStats()
-	clusterStats := article.GetClusterStats()
+	// class. This helps us to detect elements that contain the doc text.
+	classStats := doc.GetClassStats()
+	clusterStats := doc.GetClusterStats()
 
 	chunkFeatureWriter := new(chunkFeatureWriter)
-	for i, chunk := range article.Chunks {
+	for i, chunk := range doc.Chunks {
 		chunkFeatureWriter.Assign(chunkFeatures[i][:])
 		chunkFeatureWriter.WriteElementType(chunk)
 		chunkFeatureWriter.WriteParentType(chunk)
@@ -97,29 +91,29 @@ func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
 	// Now cluster chunks by containers to calculate average score per
 	// container.
 	clusterContainer := newClusterMap()
-	for i, chunk := range article.Chunks {
+	for i, chunk := range doc.Chunks {
 		clusterContainer.Add(chunk.Container, chunk, chunkFeatures[i].Score())
 	}
 
 	boostFeatureWriter := new(boostFeatureWriter)
-	for i, chunk := range article.Chunks {
+	for i, chunk := range doc.Chunks {
 		boostFeatureWriter.Assign(boostFeatures[i][:])
 		boostFeatureWriter.WriteChunk(chunk)
 		boostFeatureWriter.WriteCluster(chunk, clusterContainer[chunk.Container])
-		boostFeatureWriter.WriteTitleSimilarity(chunk, article.Title)
+		boostFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 	}
 
 	// Cluster chunks by block and add those blocks to the result whose average
 	// score is above prediction level. This makes sure that we don't split large
 	// blocks.
 	clusterBlock := newClusterMap()
-	for i, chunk := range article.Chunks {
+	for i, chunk := range doc.Chunks {
 		clusterBlock.Add(chunk.Block, chunk, boostFeatures[i].Score(), float32(chunk.Text.Len()))
 	}
 
 	// Keep blocks together.
 	result := make([]*html.Chunk, 0, 8)
-	for _, chunk := range article.Chunks {
+	for _, chunk := range doc.Chunks {
 		if clusterBlock[chunk.Block].Score() > 0.5 {
 			result = append(result, chunk)
 		}
@@ -129,98 +123,4 @@ func (ext *ChunkExtractor) Extract(article *html.Article) []*html.Chunk {
 	ext.ChunkFeatures = chunkFeatures
 	ext.BoostFeatures = boostFeatures
 	return result
-}
-
-// NewLinkExtractor creates and initializes a new LinkExtractor.
-func NewLinkExtractor() *LinkExtractor {
-	return new(LinkExtractor)
-}
-
-// Extract returns a list of links to possible news articles found on website.
-//
-// How it works
-//
-// This function calculates a score for each link found on website. The score
-// is the product of the host name frequency and the entropy of the
-// path component. If the score exceeds a fixed threshold, the link is assumed
-// to be relevant and included in the result.
-//
-// This is very simple and works surprisingly well since for most news sites,
-// the following assumptions hold:
-//
-//   1. The majority of links lead to relevant content.
-//   2. The majority of relevant links share the same host name.
-//   3. The path of a relevant link tends to be longer than the path of a
-//      non-relevant link.
-func (ext *LinkExtractor) Extract(website *html.Website) []*html.Link {
-	if len(website.Links) == 0 {
-		return nil
-	}
-
-	// Calculate the host name frequency. We assume that the more often
-	// we encounter a host name, the more important are its links.
-	hostFreq := make(map[string]float64)
-	unitFrac := 1.0 / float64(len(website.Links))
-	for _, link := range website.Links {
-		hostFreq[link.URL.Host] = hostFreq[link.URL.Host] + unitFrac
-	}
-
-	result := make([]*html.Link, 0, 8)
-	for _, link := range website.Links {
-		score := calcEntropy(link.URL.Path) * hostFreq[link.URL.Host]
-		if score >= 3.0 {
-			result = append(result, link)
-		}
-	}
-	return result
-}
-
-var (
-	entropy = map[rune]float64{
-		'a': -0.10634380971489953,
-		'b': -0.1530425750819142,
-		'c': -0.054512771770650156,
-		'd': -0.2277081908035247,
-		'e': -0.019143424124981535,
-		'f': -0.10631901817532326,
-		'g': -0.08950958783746302,
-		'h': -0.02138890867431747,
-		'i': -0.2040842535452831,
-		'j': -0.08066894356623576,
-		'k': -0.14676065483416048,
-		'l': -0.054715501033775864,
-		'm': -0.22756818123774952,
-		'n': -0.2036576755124059,
-		'o': -0.011796162629390488,
-		'p': -0.19352586509733832,
-		'q': -0.061206381465562155,
-		'r': -0.12701158290463668,
-		's': -0.10100191941724014,
-		't': -0.022872200444912123,
-		'u': -0.05095402954111724,
-		'v': -0.09120240867794169,
-		'w': -0.20676837174037171,
-		'x': -0.0856356305628621,
-		'y': -0.052914228421479595,
-		'z': -0.08290376493347784,
-		'0': -0.20509019606654505,
-		'1': -0.04936506198036805,
-		'2': -0.052649170776553546,
-		'3': -0.28439304075529853,
-		'4': -0.11790007547597285,
-		'5': -0.09902560480951333,
-		'6': -0.0624913286633471,
-		'7': -0.1247640940220319,
-		'8': -0.17807011198199005,
-		'9': -0.2233673033869976,
-	}
-)
-
-// calcEntropy returns the entropy of a string.
-func calcEntropy(s string) float64 {
-	result := 0.0
-	for _, r := range strings.ToLower(s) {
-		result += entropy[r]
-	}
-	return math.Abs(result)
 }

@@ -24,10 +24,6 @@ var (
 	// depends on the type of stdout - it's set to false if newscat isn't printing
 	// onto a terminal.
 	highlight = flag.Bool("highlight", util.IsTerminal(os.Stdout), "highlight headings and emphasized text")
-
-	// newscat extracts either article content or links.
-	extractContent = flag.Bool("content", true, "extract article content")
-	extractLinks   = flag.Bool("links", false, "extract links")
 )
 
 func init() {
@@ -35,8 +31,6 @@ func init() {
 		fmt.Fprintln(os.Stderr, `newscat [OPTION]... [PATH|URL]...
 
 Options:
-  -content    Extract article content (default).
-  -links      Extract links.
   -highlight  Use ANSI escape codes to format output.`)
 	}
 }
@@ -71,12 +65,6 @@ func printChunks(chunks []*html.Chunk) {
 	fmt.Println()
 }
 
-func printLinks(links []*html.Link) {
-	for _, link := range links {
-		fmt.Println(link.URL)
-	}
-}
-
 func main() {
 	flag.Parse()
 
@@ -102,26 +90,11 @@ func main() {
 		close(inputChannel)
 	}()
 
-	switch {
-	case *extractLinks:
-		ext := model.NewLinkExtractor()
-		for input := range inputChannel {
-			if website, err := html.NewWebsite(input.Data); err == nil {
-				// Add protocol and domain to relative links before we perform
-				// link extraction. Works only if input.Location is a URL.
-				website.ResolveBase(input.Location)
-				if links := ext.Extract(website); len(links) > 0 {
-					printLinks(links)
-				}
-			}
-		}
-	case *extractContent:
-		ext := model.NewChunkExtractor()
-		for input := range inputChannel {
-			if article, err := html.NewArticle(input.Data); err == nil {
-				if chunks := ext.Extract(article); len(chunks) > 0 {
-					printChunks(chunks)
-				}
+	ext := model.NewExtractor()
+	for input := range inputChannel {
+		if article, err := html.NewDocument(input.Data); err == nil {
+			if chunks := ext.Extract(article); len(chunks) > 0 {
+				printChunks(chunks)
 			}
 		}
 	}

@@ -6,17 +6,8 @@ import (
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/model"
 	"github.com/slyrz/newscat/util"
-	"io"
-	"net/http"
 	"os"
-	"strings"
 )
-
-// Input stores the user-provided HTML data and its location.
-type Input struct {
-	Location string    // either file path or URL or empty if data was read from stdin
-	Data     io.Reader // the HTML data (hopefully)
-}
 
 var (
 	// highlight indicates whether newscat should use ANSI escape codes
@@ -33,6 +24,7 @@ func init() {
 Options:
   -highlight  Use ANSI escape codes to format output.`)
 	}
+	flag.Parse()
 }
 
 func printChunks(chunks []*html.Chunk) {
@@ -66,36 +58,13 @@ func printChunks(chunks []*html.Chunk) {
 }
 
 func main() {
-	flag.Parse()
-
-	inputChannel := make(chan Input, 4)
-	// Open all input (file paths or URLs) or read from stdin and write the
-	// corresponding Input structs to the inputChannel channel.
-	go func() {
-		if flag.NArg() > 0 {
-			for _, arg := range flag.Args() {
-				if strings.HasPrefix(arg, "http://") || strings.HasPrefix(arg, "https://") {
-					if resp, err := http.Get(arg); err == nil {
-						inputChannel <- Input{arg, resp.Body}
-					}
-				} else {
-					if file, err := os.Open(arg); err == nil {
-						inputChannel <- Input{arg, file}
-					}
-				}
-			}
-		} else {
-			inputChannel <- Input{"", os.Stdin}
-		}
-		close(inputChannel)
-	}()
-
 	ext := model.NewExtractor()
-	for input := range inputChannel {
+	for _, input := range util.GetInput() {
 		if article, err := html.NewDocument(input.Data); err == nil {
 			if chunks := ext.Extract(article); len(chunks) > 0 {
 				printChunks(chunks)
 			}
 		}
+		input.Data.Close()
 	}
 }

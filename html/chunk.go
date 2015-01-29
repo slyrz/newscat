@@ -2,6 +2,7 @@ package html
 
 import (
 	"code.google.com/p/go.net/html"
+	"code.google.com/p/go.net/html/atom"
 	"errors"
 	"github.com/slyrz/newscat/util"
 	"strings"
@@ -31,21 +32,49 @@ type Chunk struct {
 	LinkText  float32    // link text to normal text ratio.
 }
 
+// The list of inline elements was taken from:
+//
+//   https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
+//
+// The only element missing an atom constant is <acronym>, but it's
+// obsolete according to MDN.
+var inlineElement = map[atom.Atom]bool{
+	atom.A:        true,
+	atom.Abbr:     true,
+	atom.B:        true,
+	atom.Bdo:      true,
+	atom.Big:      true,
+	atom.Br:       true,
+	atom.Button:   true,
+	atom.Cite:     true,
+	atom.Code:     true,
+	atom.Dfn:      true,
+	atom.Em:       true,
+	atom.I:        true,
+	atom.Img:      true,
+	atom.Input:    true,
+	atom.Kbd:      true,
+	atom.Label:    true,
+	atom.Map:      true,
+	atom.Object:   true,
+	atom.Q:        true,
+	atom.Samp:     true,
+	atom.Script:   true,
+	atom.Select:   true,
+	atom.Small:    true,
+	atom.Span:     true,
+	atom.Strong:   true,
+	atom.Sub:      true,
+	atom.Sup:      true,
+	atom.Textarea: true,
+	atom.Tt:       true,
+	atom.Var:      true,
+}
+
 func getParentBlock(n *html.Node) *html.Node {
 	// Keep ascending as long as the node points to an HTML inline element.
-	// We stop at the first block-level element. The list of inline elements
-	// was taken from:
-	//   https://developer.mozilla.org/en-US/docs/HTML/Inline_elements
-	for ; n != nil && n.Parent != nil; n = n.Parent {
-		switch n.Data {
-		case "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite",
-			"code", "dfn", "em", "i", "img", "input", "kbd", "label", "map",
-			"object", "q", "samp", "script", "select", "small", "span",
-			"strong", "sub", "sup", "textarea", "tt", "var":
-			continue
-		default:
-			return n
-		}
+	for n != nil && n.Parent != nil && inlineElement[n.DataAtom] {
+		n = n.Parent
 	}
 	return n
 }

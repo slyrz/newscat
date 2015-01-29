@@ -2,6 +2,7 @@ package html
 
 import (
 	"code.google.com/p/go.net/html"
+	"code.google.com/p/go.net/html/atom"
 	"errors"
 	"github.com/slyrz/newscat/util"
 	"io"
@@ -51,14 +52,14 @@ func (doc *Document) init(r io.Reader) error {
 
 	// Assign the fields html, head and body from the HTML page.
 	iterateNode(root, func(n *html.Node) int {
-		switch n.Data {
-		case "html":
+		switch n.DataAtom {
+		case atom.Html:
 			doc.html = n
 			return IterNext
-		case "body":
+		case atom.Body:
 			doc.body = n
 			return IterSkip
-		case "head":
+		case atom.Head:
 			doc.head = n
 			return IterSkip
 		}
@@ -77,7 +78,7 @@ func (doc *Document) init(r io.Reader) error {
 
 	// Detect the document title.
 	iterateNode(doc.head, func(n *html.Node) int {
-		if n.Type == html.ElementNode && n.Data == "title" {
+		if n.Type == html.ElementNode && n.DataAtom == atom.Title {
 			iterateText(n, doc.Title.WriteString)
 			return IterStop
 		}
@@ -120,7 +121,7 @@ const (
 func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, normText int) {
 	linkText = 0
 	normText = 0
-	if n.Type == html.ElementNode && n.Data == "a" {
+	if n.Type == html.ElementNode && n.DataAtom == atom.A {
 		insideLink = true
 	}
 	for s := n.FirstChild; s != nil; s = s.NextSibling {
@@ -146,24 +147,42 @@ func (doc *Document) countText(n *html.Node, insideLink bool) (linkText int, nor
 	return
 }
 
+var removeElements = map[atom.Atom]bool{
+	atom.Address:    true,
+	atom.Audio:      true,
+	atom.Button:     true,
+	atom.Canvas:     true,
+	atom.Caption:    true,
+	atom.Fieldset:   true,
+	atom.Figcaption: true,
+	atom.Figure:     true,
+	atom.Footer:     true,
+	atom.Form:       true,
+	atom.Frame:      true,
+	atom.Iframe:     true,
+	atom.Map:        true,
+	atom.Menu:       true,
+	atom.Nav:        true,
+	atom.Noscript:   true,
+	atom.Object:     true,
+	atom.Option:     true,
+	atom.Output:     true,
+	atom.Script:     true,
+	atom.Select:     true,
+	atom.Style:      true,
+	atom.Svg:        true,
+	atom.Textarea:   true,
+	atom.Video:      true,
+}
+
 // cleanBody removes unwanted HTML elements from the HTML body.
 func (doc *Document) cleanBody(n *html.Node, level int) {
-
 	// removeNode returns true if a node should be removed from HTML document.
 	removeNode := func(c *html.Node, level int) bool {
-		switch c.Data {
-		// Elements save to ignore.
-		case "address", "audio", "button", "canvas", "caption", "fieldset",
-			"figcaption", "figure", "footer", "form", "frame", "iframe",
-			"map", "menu", "nav", "noscript", "object", "option", "output",
-			"script", "select", "style", "svg", "textarea", "video":
-			return true
-		// High-level tables might be used to layout the document, so we better
-		// not ignore them.
-		case "table":
+		if c.DataAtom == atom.Table {
 			return level > 5
 		}
-		return false
+		return removeElements[c.DataAtom]
 	}
 
 	var curr *html.Node = n.FirstChild
@@ -227,12 +246,12 @@ func (doc *Document) parseBody(n *html.Node) {
 			}
 		}
 		ancestorMask := 0
-		switch n.Data {
+		switch n.DataAtom {
 		// We convert headings and links to text immediately. This is easier
 		// and feasible because headings and links don't contain many children.
 		// Descending into these children and handling every TextNode separately
 		// would make things unnecessary complicated and our results noisy.
-		case "h1", "h2", "h3", "h4", "h5", "h6", "a":
+		case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6, atom.A:
 			if chunk, err := NewChunk(doc, n); err == nil {
 				doc.Chunks = append(doc.Chunks, chunk)
 			}
@@ -241,13 +260,13 @@ func (doc *Document) parseBody(n *html.Node) {
 		// If we mask a bit which was already set by one of our callers, we'd also
 		// clear it at the end of this function, though it actually should be cleared
 		// by the caller.
-		case "doc":
+		case atom.Article:
 			ancestorMask = AncestorArticle &^ doc.ancestors
-		case "aside":
+		case atom.Aside:
 			ancestorMask = AncestorAside &^ doc.ancestors
-		case "blockquote":
+		case atom.Blockquote:
 			ancestorMask = AncestorBlockquote &^ doc.ancestors
-		case "ul", "ol":
+		case atom.Ul, atom.Ol:
 			ancestorMask = AncestorList &^ doc.ancestors
 		}
 		// Add our mask to the ancestor bitmask.

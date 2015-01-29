@@ -73,14 +73,40 @@ func NewDocument(r io.Reader) (*Document, error) {
 		return nil, ErrNoBody
 	}
 
-	// Detect the document title.
-	iterateNode(doc.head, func(n *html.Node) int {
-		if n.Type == html.ElementNode && n.DataAtom == atom.Title {
-			iterateText(n, doc.Title.WriteString)
-			return IterStop
+	// Detect the document title: First check if the document provides
+	// Open Graph metadata; if so, use the metadata rather than the
+	// value of the title element, because the metadata tends to be a tad
+	// cleaner.
+	title := ""
+	iterateNode(w.head, func(n *html.Node) int {
+		if n.Type == html.ElementNode && n.DataAtom == atom.Meta {
+			prop, content := "", ""
+			for _, attr := range n.Attr {
+				switch attr.Key {
+				case "property":
+					prop = attr.Val
+				case "content":
+					content = attr.Val
+				}
+			}
+			if prop == "og:title" && content != "" {
+				title = content
+				return IterStop
+			}
 		}
 		return IterNext
 	})
+	if title != "" {
+		w.Title.WriteString(title)
+	} else {
+		iterateNode(w.head, func(n *html.Node) int {
+			if n.Type == html.ElementNode && n.DataAtom == atom.Title {
+				iterateText(n, w.Title.WriteString)
+				return IterStop
+			}
+			return IterNext
+		})
+	}
 
 	doc.cleanBody(doc.body, 0)
 	doc.countText(doc.body, false)

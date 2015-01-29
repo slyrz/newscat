@@ -36,18 +36,11 @@ type Document struct {
 // NewDocument parses the HTML data provided through an io.Reader interface.
 func NewDocument(r io.Reader) (*Document, error) {
 	doc := new(Document)
-	if err := doc.init(r); err != nil {
-		return nil, err
-	}
-	return doc, nil
-}
-
-func (doc *Document) init(r io.Reader) error {
 	doc.Title = util.NewText()
 
 	root, err := html.Parse(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Assign the fields html, head and body from the HTML page.
@@ -69,11 +62,11 @@ func (doc *Document) init(r io.Reader) error {
 
 	switch {
 	case doc.html == nil:
-		return ErrNoHTML
+		return nil, ErrNoHTML
 	case doc.head == nil:
-		return ErrNoHead
+		return nil, ErrNoHead
 	case doc.body == nil:
-		return ErrNoBody
+		return nil, ErrNoBody
 	}
 
 	// Detect the document title.
@@ -103,7 +96,7 @@ func (doc *Document) init(r io.Reader) error {
 			doc.Chunks[i].Next = doc.Chunks[i+1]
 		}
 	}
-	return nil
+	return doc, nil
 }
 
 const (

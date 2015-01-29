@@ -78,7 +78,7 @@ func NewDocument(r io.Reader) (*Document, error) {
 	// value of the title element, because the metadata tends to be a tad
 	// cleaner.
 	title := ""
-	iterateNode(w.head, func(n *html.Node) int {
+	iterateNode(doc.head, func(n *html.Node) int {
 		if n.Type == html.ElementNode && n.DataAtom == atom.Meta {
 			prop, content := "", ""
 			for _, attr := range n.Attr {
@@ -97,11 +97,11 @@ func NewDocument(r io.Reader) (*Document, error) {
 		return IterNext
 	})
 	if title != "" {
-		w.Title.WriteString(title)
+		doc.Title.WriteString(title)
 	} else {
-		iterateNode(w.head, func(n *html.Node) int {
+		iterateNode(doc.head, func(n *html.Node) int {
 			if n.Type == html.ElementNode && n.DataAtom == atom.Title {
-				iterateText(n, w.Title.WriteString)
+				iterateText(n, doc.Title.WriteString)
 				return IterStop
 			}
 			return IterNext

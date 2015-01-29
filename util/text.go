@@ -34,6 +34,10 @@ func isWord(text string) bool {
 	return (len(text) > 2) && (letters >= (len(text) - 2))
 }
 
+func (t *Text) WriteText(s *Text) {
+        t.WriteString(s.String())
+}
+
 func (t *Text) WriteString(s string) {
 	// If buffer contains text, write a space first to avoid joining words
 	// accidentally.

@@ -1,7 +1,14 @@
 package model
 
 import (
+	"errors"
 	"github.com/slyrz/newscat/html"
+	"github.com/slyrz/newscat/util"
+)
+
+var (
+	ErrNoChunks    = errors.New("document contains no chunks")
+	ErrEmptyResult = errors.New("nothing found")
 )
 
 // Extractor utilizes the trained model to extract relevant html.Chunks from
@@ -33,11 +40,11 @@ func NewExtractor() *Extractor {
 //
 // By now you might have noticed that I'm exceptionally bad at naming and
 // describing things properly.
-func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
+func (ext *Extractor) Extract(doc *html.Document) (*util.Article, error) {
 	ext.ChunkFeatures = nil
 	ext.BoostFeatures = nil
 	if len(doc.Chunks) == 0 {
-		return nil
+		return nil, ErrNoChunks
 	}
 
 	chunkFeatures := make([]chunkFeature, len(doc.Chunks))
@@ -111,16 +118,29 @@ func (ext *Extractor) Extract(doc *html.Document) []*html.Chunk {
 		clusterBlock.Add(chunk.Block, chunk, boostFeatures[i].Score(), float32(chunk.Text.Len()))
 	}
 
-	// Keep blocks together.
-	result := make([]*html.Chunk, 0, 8)
+	result := &util.Article{
+		Title: doc.Title.String(),
+	}
 	for _, chunk := range doc.Chunks {
-		if clusterBlock[chunk.Block].Score() > 0.5 {
-			result = append(result, chunk)
+		if cluster, ok := clusterBlock[chunk.Block]; ok && cluster.Score() > 0.5 {
+			text := util.NewText()
+			for _, chunk := range cluster.Chunks {
+				text.WriteText(chunk.Text)
+			}
+			if chunk.IsHeading() {
+				result.Text = append(result.Text, util.Heading(text.String()))
+			} else {
+				result.Text = append(result.Text, util.Paragraph(text.String()))
+			}
+			delete(clusterBlock, chunk.Block)
 		}
+	}
+	if len(result.Text) == 0 {
+		return nil, ErrEmptyResult
 	}
 
 	// Make them accessible.
 	ext.ChunkFeatures = chunkFeatures
 	ext.BoostFeatures = boostFeatures
-	return result
+	return result, nil
 }

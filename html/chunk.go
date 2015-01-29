@@ -229,3 +229,12 @@ func (ch *Chunk) GetChildTypes() []string {
 	}
 	return result
 }
+
+func (ch *Chunk) IsHeading() bool {
+	switch ch.Block.DataAtom {
+	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		return true
+	default:
+		return false
+	}
+}

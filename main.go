@@ -27,42 +27,27 @@ Options:
 	flag.Parse()
 }
 
-func printChunks(chunks []*html.Chunk) {
-	var last *html.Chunk = nil
-	for _, chunk := range chunks {
-		delim, pre, pos := "", "", ""
-		// If the last chunk and the current chunk are part of the same HTML block,
-		// separate them by a space character. Otherwise use two newline characters
-		// to create a new paragraph.
-		if last != nil {
-			switch {
-			case last.Block != chunk.Block:
-				delim = "\n\n"
-			case last.Block == chunk.Block:
-				delim = " "
-			}
-		}
+func printArticle(article *util.Article) {
+	pre, pos := "", ""
+	for _, text := range article.Text {
 		if *highlight {
-			// Print headings and emphasized text bold.
-			switch chunk.Base.Data {
-			case "h1", "h2", "h3", "h4", "h5", "h6", "em", "strong", "b":
+			switch text.(type) {
+			case util.Heading:
 				pre, pos = "\x1b[1m", "\x1b[0m"
-			default:
+			case util.Paragraph:
 				pre, pos = "", ""
 			}
 		}
-		fmt.Printf("%s%s%s%s", delim, pre, chunk.Text, pos)
-		last = chunk
+		fmt.Printf("%s%s%s\n\n", pre, text, pos)
 	}
-	fmt.Println()
 }
 
 func main() {
 	ext := model.NewExtractor()
 	for _, input := range util.GetInput() {
 		if article, err := html.NewDocument(input.Data); err == nil {
-			if chunks := ext.Extract(article); len(chunks) > 0 {
-				printChunks(chunks)
+			if article, err := ext.Extract(article); err == nil {
+				printArticle(article)
 			}
 		}
 		input.Data.Close()

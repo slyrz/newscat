@@ -35,12 +35,16 @@ type Document struct {
 
 // NewDocument parses the HTML data provided through an io.Reader interface.
 func NewDocument(r io.Reader) (*Document, error) {
-	doc := new(Document)
-	doc.Title = util.NewText()
-
 	root, err := html.Parse(r)
 	if err != nil {
 		return nil, err
+	}
+
+	doc := &Document{
+		Title:    util.NewText(),
+		Chunks:   make([]*Chunk, 0, 512),
+		linkText: make(map[*html.Node]int),
+		normText: make(map[*html.Node]int),
 	}
 
 	// Assign the fields html, head and body from the HTML page.
@@ -77,10 +81,6 @@ func NewDocument(r io.Reader) (*Document, error) {
 		}
 		return IterNext
 	})
-
-	doc.Chunks = make([]*Chunk, 0, 512)
-	doc.linkText = make(map[*html.Node]int)
-	doc.normText = make(map[*html.Node]int)
 
 	doc.cleanBody(doc.body, 0)
 	doc.countText(doc.body, false)

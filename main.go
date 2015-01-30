@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/slyrz/newscat/html"
 	"github.com/slyrz/newscat/model"
@@ -9,28 +8,12 @@ import (
 	"os"
 )
 
-var (
-	// highlight indicates whether newscat should use ANSI escape codes
-	// to print headings and emphasized text in bold type. The default value of this flag
-	// depends on the type of stdout - it's set to false if newscat isn't printing
-	// onto a terminal.
-	highlight = flag.Bool("highlight", util.IsTerminal(os.Stdout), "highlight headings and emphasized text")
-)
-
-func init() {
-	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, `newscat [OPTION]... [PATH|URL]...
-
-Options:
-  -highlight  Use ANSI escape codes to format output.`)
-	}
-	flag.Parse()
-}
+var highlight = util.IsTerminal(os.Stdout)
 
 func printArticle(article *util.Article) {
 	pre, pos := "", ""
 	for _, text := range article.Text {
-		if *highlight {
+		if highlight {
 			switch text.(type) {
 			case util.Heading:
 				pre, pos = "\x1b[1m", "\x1b[0m"
@@ -44,7 +27,7 @@ func printArticle(article *util.Article) {
 
 func main() {
 	ext := model.NewExtractor()
-	for _, input := range util.GetInput() {
+	for _, input := range util.GetInput(os.Args[1:]) {
 		if article, err := html.NewDocument(input.Data); err == nil {
 			if article, err := ext.Extract(article); err == nil {
 				printArticle(article)

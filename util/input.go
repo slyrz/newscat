@@ -1,7 +1,6 @@
 package util
 
 import (
-	"flag"
 	"io"
 	"net/http"
 	"os"
@@ -14,10 +13,10 @@ type Input struct {
 	Data   io.ReadCloser // the HTML data (hopefully)
 }
 
-func GetInput() []Input {
+func GetInput(args []string) []Input {
 	result := make([]Input, 0)
-	if flag.NArg() > 0 {
-		for _, arg := range flag.Args() {
+	if len(args) > 0 {
+		for _, arg := range args {
 			if strings.HasPrefix(arg, "http://") || strings.HasPrefix(arg, "https://") {
 				if resp, err := http.Get(arg); err == nil {
 					result = append(result, Input{arg, resp.Body})

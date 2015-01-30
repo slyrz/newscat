@@ -15,3 +15,11 @@ func (a *Article) Append(v interface{}) {
 func (a *Article) Prepend(v interface{}) {
 	a.Text = append([]interface{}{v}, a.Text...)
 }
+
+func (a *Article) StartsWithHeading() bool {
+	if len(a.Text) == 0 {
+		return false
+	}
+	_, ok := a.Text[0].(Heading)
+	return ok
+}

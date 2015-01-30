@@ -28,8 +28,14 @@ func printArticle(article *util.Article) {
 func main() {
 	ext := model.NewExtractor()
 	for _, input := range util.GetInput(os.Args[1:]) {
-		if article, err := html.NewDocument(input.Data); err == nil {
-			if article, err := ext.Extract(article); err == nil {
+		if document, err := html.NewDocument(input.Data); err == nil {
+			if article, err := ext.Extract(document); err == nil {
+				// Extraction might miss the article heading. So if the text
+				// doesn't start with a heading, use the article title as
+				// opening heading.
+				if !article.StartsWithHeading() && article.Title != "" {
+					article.Prepend(util.Heading(article.Title))
+				}
 				printArticle(article)
 			}
 		}

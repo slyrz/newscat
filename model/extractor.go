@@ -128,9 +128,9 @@ func (ext *Extractor) Extract(doc *html.Document) (*util.Article, error) {
 				text.WriteText(chunk.Text)
 			}
 			if chunk.IsHeading() {
-				result.Text = append(result.Text, util.Heading(text.String()))
+				result.Append(util.Heading(text.String()))
 			} else {
-				result.Text = append(result.Text, util.Paragraph(text.String()))
+				result.Append(util.Paragraph(text.String()))
 			}
 			delete(clusterBlock, chunk.Block)
 		}

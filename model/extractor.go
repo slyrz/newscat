@@ -14,8 +14,7 @@ var (
 // Extractor utilizes the trained model to extract relevant html.Chunks from
 // an html.Document.
 type Extractor struct {
-	ChunkFeatures []chunkFeature
-	BoostFeatures []boostFeature
+	Labels []bool
 }
 
 // NewExtractor creates and initializes a new Extractor.
@@ -41,8 +40,7 @@ func NewExtractor() *Extractor {
 // By now you might have noticed that I'm exceptionally bad at naming and
 // describing things properly.
 func (ext *Extractor) Extract(doc *html.Document) (*util.Article, error) {
-	ext.ChunkFeatures = nil
-	ext.BoostFeatures = nil
+	*ext = Extractor{}
 	if len(doc.Chunks) == 0 {
 		return nil, ErrNoChunks
 	}
@@ -110,19 +108,24 @@ func (ext *Extractor) Extract(doc *html.Document) (*util.Article, error) {
 		boostFeatureWriter.WriteTitleSimilarity(chunk, doc.Title)
 	}
 
-	// Cluster chunks by block and add those blocks to the result whose average
-	// score is above prediction level. This makes sure that we don't split large
-	// blocks.
+	// Cluster chunks by block.
 	clusterBlock := newClusterMap()
 	for i, chunk := range doc.Chunks {
 		clusterBlock.Add(chunk.Block, chunk, boostFeatures[i].Score(), float32(chunk.Text.Len()))
 	}
 
-	result := &util.Article{
-		Title: doc.Title.String(),
+	// Label all chunks whose blocks have a score above prediction level.
+	// This makes sure that we don't split large blocks.
+	ext.Labels = make([]bool, len(doc.Chunks))
+	for i, chunk := range doc.Chunks {
+		if cluster, ok := clusterBlock[chunk.Block]; ok {
+			ext.Labels[i] = cluster.Score() > 0.5
+		}
 	}
-	for _, chunk := range doc.Chunks {
-		if cluster, ok := clusterBlock[chunk.Block]; ok && cluster.Score() > 0.5 {
+
+	result := &util.Article{Title: doc.Title.String()}
+	for i, chunk := range doc.Chunks {
+		if cluster, ok := clusterBlock[chunk.Block]; ok && ext.Labels[i] {
 			text := util.NewText()
 			for _, chunk := range cluster.Chunks {
 				text.WriteText(chunk.Text)
@@ -138,9 +141,5 @@ func (ext *Extractor) Extract(doc *html.Document) (*util.Article, error) {
 	if len(result.Text) == 0 {
 		return nil, ErrEmptyResult
 	}
-
-	// Make them accessible.
-	ext.ChunkFeatures = chunkFeatures
-	ext.BoostFeatures = boostFeatures
 	return result, nil
 }

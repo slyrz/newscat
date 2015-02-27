@@ -1,7 +1,7 @@
 package model
 
 import (
-	gonet "code.google.com/p/go.net/html"
+	gonet "golang.org/x/net/html"
 	"github.com/slyrz/newscat/html"
 )
 

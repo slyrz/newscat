@@ -1,10 +1,10 @@
 package html
 
 import (
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 	"errors"
 	"github.com/slyrz/newscat/util"
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 	"io"
 	"unicode"
 )
@@ -176,7 +176,6 @@ var removeElements = map[atom.Atom]bool{
 	atom.Figcaption: true,
 	atom.Figure:     true,
 	atom.Footer:     true,
-	atom.Form:       true,
 	atom.Frame:      true,
 	atom.Iframe:     true,
 	atom.Map:        true,
@@ -198,9 +197,6 @@ var removeElements = map[atom.Atom]bool{
 func (doc *Document) cleanBody(n *html.Node, level int) {
 	// removeNode returns true if a node should be removed from HTML document.
 	removeNode := func(c *html.Node, level int) bool {
-		if c.DataAtom == atom.Table {
-			return level > 5
-		}
 		return removeElements[c.DataAtom]
 	}
 

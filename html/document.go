@@ -248,18 +248,21 @@ func (doc *Document) parseBody(n *html.Node) {
 	case html.ElementNode:
 		// We ignore the node if it has some nasty classes/ids/itemprops or if
 		// its style attribute contains "display: none".
-		for _, attr := range n.Attr {
-			switch attr.Key {
-			case "id", "class", "itemprop":
-				if ignoreNames.In(attr.Val) {
-					return
-				}
-			case "style":
-				if ignoreStyle.In(attr.Val) {
-					return
+		if n.DataAtom != atom.Body && n.DataAtom != atom.Article {
+			for _, attr := range n.Attr {
+				switch attr.Key {
+				case "id", "class", "itemprop":
+					if ignoreNames.In(attr.Val) {
+						return
+					}
+				case "style":
+					if ignoreStyle.In(attr.Val) {
+						return
+					}
 				}
 			}
 		}
+
 		ancestorMask := 0
 		switch n.DataAtom {
 		// We convert headings and links to text immediately. This is easier
